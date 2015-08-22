@@ -24,7 +24,7 @@ function preload(game) {
     , 'tileset_wall'
   ];
   const tilemaps = [
-    'test'
+    'test', 'test2'
   ];
 
   for (let img of images)
@@ -37,12 +37,13 @@ function create(game) {
   game.stage.backgroundColor = 0x363636;
   game.physics.startSystem(Phaser.Physics.ARCADE);
 
-  game.level = new Level(game, 'test', [
+  game.level = new Level(game, 'test2', [
     'floor_tile', 'box_tile', 'tileset_wall'
   ]);
   game.guards = [
     new Guard(game, { x: 100, y: 100 })
   ];
+
   game.cameraman = new CameraMan(game);
 }
 
@@ -51,6 +52,7 @@ function update(game) {
     guard.update();
     game.physics.arcade.collide(guard.sprite.guard, game.level.blocked);
   }
+  game.cameraman.update();
 }
 
 window.game = game;

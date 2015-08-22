@@ -4,18 +4,16 @@ export class CameraMan {
     this.game = game;
     this.camera = game.camera;
     this.cursors = game.input.keyboard.createCursorKeys();
+  }
 
-    this.cursors.up.onDown.add(_ => {
+  update() {
+    if (this.cursors.up.isDown)
       this.camera.y -= 4;
-    });
-    this.cursors.down.onDown.add(_ => {
+    else if (this.cursors.down.isDown)
       this.camera.y += 4;
-    });
-    this.cursors.left.onDown.add(_ => {
+    else if (this.cursors.left.isDown)
       this.camera.x -= 4;
-    });
-    this.cursors.right.onDown.add(_ => {
+    else if (this.cursors.right.isDown)
       this.camera.x += 4;
-    });
   }
 };
