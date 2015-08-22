@@ -9,11 +9,13 @@ export class Level {
 
     this.ground = this.tilemap.createLayer('ground');
     this.ground.smoothed = false;
-    this.ground.scale = { x: 3, y: 3 };
-    this.ground.resizeWorld();
+    this.ground.setScale(3,3);
 
     this.blocked = this.tilemap.createLayer('blocked');
     this.blocked.smoothed = false;
-    this.blocked.scale = { x: 3, y: 3 };
+    this.blocked.setScale(3,3);
+
+    this.tilemap.setCollisionBetween(1, 100000, true, this.blocked, true);
+    this.ground.resizeWorld();
   }
 };

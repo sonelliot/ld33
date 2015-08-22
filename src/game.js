@@ -5,6 +5,7 @@ let game = new Phaser.Game(800, 600, Phaser.AUTO, null, {
 
 import {Level} from './level.js';
 import {Guard} from './guard.js';
+import {CameraMan} from './cameraman.js';
 
 function preload(game) {
   function sprite(name) {
@@ -42,11 +43,14 @@ function create(game) {
   game.guards = [
     new Guard(game, { x: 100, y: 100 })
   ];
+  game.cameraman = new CameraMan(game);
 }
 
 function update(game) {
-  for (let guard of game.guards)
+  for (let guard of game.guards) {
     guard.update();
+    game.physics.arcade.collide(guard.sprite.guard, game.level.blocked);
+  }
 }
 
 window.game = game;

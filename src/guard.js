@@ -20,6 +20,7 @@ export class Guard {
     });
 
     game.physics.enable(this.sprite.guard, Phaser.Physics.ARCADE);
+    this.sprite.guard.body.collideWorldBounds = true;
 
     let pointer = game.input.activePointer;
     pointer.leftButton.onDown.add(_ => {
@@ -31,7 +32,7 @@ export class Guard {
   }
 
   select() {
-    this.destination = null;
+    this.stop();
     if (this.selected === true) {
       this.selected = false;
       this.sprite.guard.scale.set(3,3);
@@ -50,9 +51,13 @@ export class Guard {
       sprite.body.velocity.set(this.speed * dirn.x, this.speed * dirn.y);
 
       if (between.getMagnitude() < 1.0) {
-        this.destination = null;
-        sprite.body.velocity.set(0,0);
+        this.stop();
       }
     }
+  }
+
+  stop() {
+    this.destination = null;
+    this.sprite.guard.body.velocity.set(0,0);
   }
 };
