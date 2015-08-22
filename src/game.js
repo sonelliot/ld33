@@ -12,7 +12,8 @@ function preload(game) {
   }
 
   const images = [
-    'guard', 'intruder'
+    'guard',
+    'intruder'
   ];
 
   for (let img of images)
@@ -26,6 +27,7 @@ function create(game) {
   let entities = [], systems = [];
 
   systems.push(System.display(game));
+  systems.push(System.selected(game));
 
   entities.push(Entity.guard(game));
 

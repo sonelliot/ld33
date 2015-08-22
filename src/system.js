@@ -1,4 +1,3 @@
-
 export class System {
   constructor(game, name, types, tick) {
     this.game = game;
@@ -31,10 +30,20 @@ export class System {
     });
   }
 
-  static facing(game) {
-    return new System(game, 'facing', ['facing'], (delta, entity) => {
+  static selected(game) {
+    return new System(game, 'selected', ['selected'], (delta, entity) => {
+      let sprite = entity.first('sprite');
+      if (sprite === undefined)
+        return entity;
+
+      let selected = entity.first('selected');
       let scale = entity.first('scale');
-      let facing = entity.first('facing');
+      if (selected.value === true)
+        scale.set(3.5, 3.5);
+      else
+        scale.set(3.0, 3.0);
+
+      return entity;
     });
   }
 };
