@@ -4,6 +4,7 @@ let game = new Phaser.Game(800, 600, Phaser.AUTO, null, {
   preload, create, update });
 
 import {Level} from './level.js';
+import {Guard} from './guard.js';
 
 function preload(game) {
   function sprite(name) {
@@ -34,12 +35,18 @@ function preload(game) {
 function create(game) {
   game.stage.backgroundColor = 0x363636;
   game.physics.startSystem(Phaser.Physics.ARCADE);
+
   game.level = new Level(game, 'test', [
     'floor_tile', 'box_tile', 'tileset_wall'
   ]);
+  game.guards = [
+    new Guard(game, { x: 100, y: 100 })
+  ];
 }
 
 function update(game) {
+  for (let guard of game.guards)
+    guard.update();
 }
 
 window.game = game;
