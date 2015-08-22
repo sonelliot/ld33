@@ -3,6 +3,8 @@
 let game = new Phaser.Game(800, 600, Phaser.AUTO, null, {
   preload, create, update });
 
+import {Level} from './level.js';
+
 function preload(game) {
   function sprite(name) {
     game.load.image(name, name + '.png');
@@ -32,6 +34,9 @@ function preload(game) {
 function create(game) {
   game.stage.backgroundColor = 0x363636;
   game.physics.startSystem(Phaser.Physics.ARCADE);
+  game.level = new Level(game, 'test', [
+    'floor_tile', 'box_tile', 'tileset_wall'
+  ]);
 }
 
 function update(game) {
