@@ -4,7 +4,7 @@ let game = new Phaser.Game(800, 600, Phaser.AUTO, null, {
   preload, create, update });
 let paused = false;
 
-const DURATION = 5;
+const DURATION = 60;
 
 import {Level} from './level.js';
 import {Guard} from './guard.js';
@@ -58,6 +58,8 @@ function loadLevel(game, name) {
 
   console.log('loading ' + name + ' ...');
 
+  game.levelName.text = 'level: ' + name;
+
   game.guards = [];
   game.characters = [];
   game.level = new Level(game, name, [
@@ -92,6 +94,10 @@ function create(game) {
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.zoom = 2;
 
+  game.actions = {};
+  game.actions.win = win;
+  game.actions.lose = lose;
+
   game.menu = {};
   game.menu.lose = new Menu(game, { title: 'YOU LOSE', button: 'RETRY' }, _ => {
     game.menu.lose.setVisible(false);
@@ -99,10 +105,11 @@ function create(game) {
   });
 
   game.menu.win = new Menu(game, { title: 'YOU WIN', button: 'NEXT' }, _ => {
-    // loadLevel(game, 'test2');
+    game.menu.win.setVisible(false);
+    loadLevel(game, 'test2');
   });
   game.timer = new Timer(game, 5.0, _ => lose());
-  game.levelName = game.add.text(15, 10, 'level: ' + name, {
+  game.levelName = game.add.text(15, 10, 'level: ', {
       font: '14px Pixel', fill: 'white' });
 
   loadLevel(game, 'test2');
