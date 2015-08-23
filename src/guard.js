@@ -5,6 +5,7 @@ export class Guard {
     this.destination = null;
     this.speed = 100.0;
     this.path = [];
+    this.facing = new Phaser.Point();
 
     this.sprite = {};
     this.group = game.add.group();
@@ -24,6 +25,12 @@ export class Guard {
     this.sprite.guard.body.collideWorldBounds = true;
     this.sprite.guard.body.setSize(5,5,0,0);
 
+    this.sprite.cone = game.add.sprite(0, 0, 'cone', null, this.group);
+    this.sprite.cone.alpha = 0.5;
+    this.sprite.cone.anchor.set(0.525, 0.0);
+    this.sprite.cone.smoothed = false;
+    this.sprite.cone.scale.set(3,3);
+
     let pointer = game.input.activePointer;
     pointer.leftButton.onDown.add(_ => {
       if (this.selected === true) {
@@ -31,6 +38,8 @@ export class Guard {
         let sprite = this.sprite.guard;
         let target = new Phaser.Point(pointer.worldX, pointer.worldY);
         level.path(sprite.position, target, path => {
+          if (path === null || path.length === 0)
+            return;
           this.path = path.splice(1);
           this.showPath(this.path);
         });
@@ -47,8 +56,12 @@ export class Guard {
     }
   }
 
-  showPath(path) {
+  hidePath() {
     this.disks.forEach(d => d.visible = false);
+  }
+
+  showPath(path) {
+    this.hidePath();
     for (let i =0; i < path.length; i++) {
       let point = path[i];
       let disk = this.disks[i];
@@ -73,6 +86,7 @@ export class Guard {
     let sprite = this.sprite.guard;
     let between = Phaser.Point.subtract(dest, sprite.position);
     let dirn = Phaser.Point.normalize(between);
+    this.facing = dirn;
     sprite.body.velocity.set(this.speed * dirn.x, this.speed * dirn.y);
     if (between.getMagnitude() < 1.0)
       return true;
@@ -89,9 +103,22 @@ export class Guard {
     }
     else
       this.stop();
+
+    this.updateCone();
+  }
+
+  updateCone() {
+    let velocity = this.sprite.guard.body.velocity;
+    if (velocity.getMagnitudeSq() > 0) {
+      let rotation = velocity.angle(new Phaser.Point(0,1)) + (Math.PI / 2);
+      this.sprite.cone.rotation = rotation;
+    }
+    this.sprite.cone.position.copyFrom(this.sprite.guard.position);
+    this.sprite.cone.position.add(this.facing.x * 10, this.facing.y * 10);
   }
 
   stop() {
     this.sprite.guard.body.velocity.set(0,0);
+    this.hidePath();
   }
 };

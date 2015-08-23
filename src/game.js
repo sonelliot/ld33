@@ -17,6 +17,7 @@ function preload(game) {
 
   const images = [
     , 'box_tile'
+    , 'cone'
     , 'disk'
     , 'floor_tile'
     , 'guard'
