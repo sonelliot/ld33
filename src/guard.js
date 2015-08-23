@@ -10,11 +10,11 @@ export class Guard extends Character {
     //   this.select();
     // });
 
-    this.sprite.cone = game.add.sprite(0, 0, 'cone', null, this.group);
-    this.sprite.cone.alpha = 0.5;
-    this.sprite.cone.anchor.set(0.525, 0.0);
-    this.sprite.cone.smoothed = false;
-    this.sprite.cone.scale.set(this.game.zoom,this.game.zoom);
+    // this.sprite.cone = game.add.sprite(0, 0, 'cone', null, this.group);
+    // this.sprite.cone.alpha = 0.5;
+    // this.sprite.cone.anchor.set(0.525, 0.0);
+    // this.sprite.cone.smoothed = false;
+    // this.sprite.cone.scale.set(this.game.zoom,this.game.zoom);
 
     let pointer = game.input.activePointer;
     pointer.leftButton.onDown.add(_ => {
@@ -78,7 +78,7 @@ export class Guard extends Character {
 
   update() {
     super.update();
-    this.updateCone();
+    // this.updateCone();
   }
 
   updateCone() {

@@ -38,7 +38,7 @@ export class Character {
   }
 
   update() {
-    this.game.debug.body(this.sprite.main);
+    // this.game.debug.body(this.sprite.main);
 
     if (this.path.length > 0) {
       let next = this.path[0];

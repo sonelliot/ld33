@@ -66,6 +66,7 @@ function update(game) {
     game.physics.arcade.collide(character.sprite.main, game.level.blocked);
   }
   game.cameraman.update();
+  // game.level.fogOfWar(game.guards.map(g => g.sprite.main.position));
 }
 
 window.game = game;

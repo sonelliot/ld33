@@ -56,6 +56,15 @@ export class Level {
     });
   }
 
+  fogOfWar(lights) {
+    const {width, height} = this.game;
+    let tiles = [];
+    for (let layer of this.tilemap.layers)
+      tiles.concat(layer.getTiles(0, 0, width, height));
+    for (let tile of tiles)
+      tile.alpha = 0.5;
+  }
+
   path(start, end, then) {
     let scale = { x: this.game.zoom, y: this.game.zoom };
     let startIndex = Level.tileIndex(start, this.tilemap, scale);

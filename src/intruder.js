@@ -3,26 +3,40 @@ import {Character} from './character.js';
 export class Intruder extends Character {
   constructor(game, position={x:0, y:0}) {
     super(game, 'intruder', position);
+    this.speed = 50;1
     this.locations = {};
-
-    this.sprite.target = game.add.sprite(0, 0, 'disk');
-    this.sprite.target.anchor.set(0.5, 0.5);
-    this.sprite.target.scale.set(game.zoom * 0.75, game.zoom * 0.75);
-    this.sprite.target.tint = 0xff0000;
   }
 
   update() {
     super.update();
+    this.updatePath();
+    this.updateVisible();1
+  }
 
+  updatePath() {
     let {level} = this.game;
     let position = this.sprite.main.position;
     let dest = this.selectDestination();
-    this.sprite.target.position.copyFrom(dest);
     level.path(position, dest, path => {
       if (path === null)
         return;
       this.path = path.splice(1);
     });
+  }
+
+  updateVisible() {
+    let position = this.sprite.main.position;
+    let closest = this.closest(position, this.game.guards.map(
+      g => g.sprite.main.position));
+    let dist = Phaser.Point.distance(position, closest);
+    if (dist < 100) {
+      this.sprite.main.alpha = 1.0;
+    }
+    else if (dist < 150) {
+      this.sprite.main.alpha = 0.5;
+    }
+    else
+      this.sprite.main.alpha = 0.0;
   }
 
   selectDestination() {
