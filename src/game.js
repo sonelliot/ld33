@@ -2,12 +2,16 @@
 
 let game = new Phaser.Game(800, 600, Phaser.AUTO, null, {
   preload, create, update });
+let paused = false;
+
+const DURATION = 5;
 
 import {Level} from './level.js';
 import {Guard} from './guard.js';
 import {Intruder} from './intruder.js';
 import {CameraMan} from './cameraman.js';
 import {Menu} from './menu.js';
+import {Timer} from './timer.js';
 
 function preload(game) {
   function sprite(name) {
@@ -47,42 +51,40 @@ function clear(game) {
     game.level.tilemap.destroy();
     game.level = null;
   }
-
-  if (game.menu && game.menu.lose) {
-    game.menu.lose.group.destroy();
-    game.menu.lose = null;
-  }
 }
 
 function loadLevel(game, name) {
   clear(game);
+
+  console.log('loading ' + name + ' ...');
 
   game.guards = [];
   game.characters = [];
   game.level = new Level(game, name, [
     'floor_tile', 'box_tile', 'tileset_wall'
   ]);
+  game.level.name = name;
   game.level.spawn();
 
-  let numbers = ['ONE', 'TWO', 'THREE', 'FOUR'];
-  for (let i = 0; i < game.guards.length; i++) {
-    let number = numbers[i];
-    let key = game.input.keyboard.addKey(Phaser.Keyboard[number]);
-    let guard = game.guards[i];
-    key.onDown.add(_ => {
-      guard.select();
-    });
-  }
+  game.world.bringToTop(game.menu.win.group);
+  game.world.bringToTop(game.menu.lose.group);
+  game.world.bringToTop(game.timer.group);
+  game.world.bringToTop(game.levelName);
 
-  game.menu = {};
-  game.menu.lose = new Menu(game, { title: 'YOU LOSE', button: 'RETRY' }, _ => {
-    loadLevel(game, 'test2');
-  });
-  game.menu.win = new Menu(game, { title: 'YOU WIN', button: 'NEXT' }, _ => {
-    loadLevel(game, 'test2');
-  });
+  game.timer.remaining = DURATION;
+  game.timer.update();
 
-  game.paused = false;
+  paused = false;
+}
+
+function win() {
+  paused = true;
+  game.menu.win.setVisible(true);
+}
+
+function lose() {
+  paused = true;
+  game.menu.lose.setVisible(true);
 }
 
 function create(game) {
@@ -90,13 +92,35 @@ function create(game) {
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.zoom = 2;
 
+  game.menu = {};
+  game.menu.lose = new Menu(game, { title: 'YOU LOSE', button: 'RETRY' }, _ => {
+    game.menu.lose.setVisible(false);
+    loadLevel(game, 'test2');
+  });
+
+  game.menu.win = new Menu(game, { title: 'YOU WIN', button: 'NEXT' }, _ => {
+    // loadLevel(game, 'test2');
+  });
+  game.timer = new Timer(game, 5.0, _ => lose());
+  game.levelName = game.add.text(15, 10, 'level: ' + name, {
+      font: '14px Pixel', fill: 'white' });
+
   loadLevel(game, 'test2');
+
+  let numbers = ['ONE', 'TWO', 'THREE', 'FOUR'];
+  for (let i = 0; i < game.guards.length; i++) {
+    let number = numbers[i];
+    let key = game.input.keyboard.addKey(Phaser.Keyboard[number]);
+    key.onDown.add(_ => {
+      game.guards[i].select();
+    });
+  }
 
   game.cameraman = new CameraMan(game);
 }
 
 function update(game) {
-  if (game.paused)
+  if (paused === true)
     return;
 
   for (let character of game.characters) {
@@ -104,6 +128,7 @@ function update(game) {
     game.physics.arcade.collide(character.sprite.main, game.level.blocked);
   }
   game.cameraman.update();
+  game.timer.update();
 }
 
 window.game = game;

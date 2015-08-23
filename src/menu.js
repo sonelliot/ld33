@@ -17,7 +17,7 @@ export class Menu {
     this.button = new Button(game, this.group, button, click);
     this.button.position.set(95, 100);
 
-    this.group.visible = false;1
+    this.setVisible(false);
   }
 
   setVisible(visible) {
