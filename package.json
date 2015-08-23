@@ -3,7 +3,9 @@
   "description": "Warm-up for the upcoming LD33 game jam!",
   "dependencies": {
     "babel": "~5.8.21",
-    "uuid": "~2.0.1"
+    "uuid": "~2.0.1",
+    "functional.js": "~0.6.16",
+    "easystarjs": "~0.2.1"
   },
   "devDependencies": {
     "vinyl-source-stream": "~1.1.0",
