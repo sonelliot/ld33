@@ -6,9 +6,9 @@ export class Guard extends Character {
 
     this.facing = new Phaser.Point();
 
-    this.sprite.main.events.onInputDown.add(_ => {
-      this.select();
-    });
+    // this.sprite.main.events.onInputDown.add(_ => {
+    //   this.select();
+    // });
 
     this.sprite.cone = game.add.sprite(0, 0, 'cone', null, this.group);
     this.sprite.cone.alpha = 0.5;
@@ -56,16 +56,24 @@ export class Guard extends Character {
     }
   }
 
-  select() {
-    this.stop();
-    if (this.selected === true) {
-      this.selected = false;
-      this.sprite.main.scale.set(this.game.zoom,this.game.zoom);
+  select(enable) {
+    enable = (enable !== undefined) ? enable : !this.selected;
+
+    if (this.selected === enable)
+      return;
+
+    let active = this.game.guards.active;
+    if (active !== this) {
+      if (active !== undefined)
+        this.game.guards.active.select(false);
+      this.game.guards.active = this;
     }
-    else {
-      this.selected = true;
+
+    this.selected = enable;
+    if (enable === true)
       this.sprite.main.scale.set(this.game.zoom * 1.25, this.game.zoom * 1.25);
-    }
+    else
+      this.sprite.main.scale.set(this.game.zoom,this.game.zoom);
   }
 
   update() {

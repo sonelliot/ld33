@@ -46,6 +46,17 @@ function create(game) {
     'floor_tile', 'box_tile', 'tileset_wall'
   ]);
   game.level.spawn();
+
+  let numbers = ['ONE', 'TWO', 'THREE', 'FOUR'];
+  for (let i = 0; i < game.guards.length; i++) {
+    let number = numbers[i];
+    let key = game.input.keyboard.addKey(Phaser.Keyboard[number]);
+    let guard = game.guards[i];
+    key.onDown.add(_ => {
+      guard.select();
+    });
+  }
+
   game.cameraman = new CameraMan(game);
 }
 
