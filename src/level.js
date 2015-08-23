@@ -1,5 +1,8 @@
 import * as EasyStar from 'easystarjs';
 
+import {Guard} from './guard.js';
+import {Intruder} from './intruder.js';
+
 export class Level {
   constructor(game, name, tilesets) {
     this.game = game;
@@ -11,7 +14,7 @@ export class Level {
     for (let name of ['ground', 'blocked', 'walls']) {
       let layer = this.tilemap.createLayer(name);
       layer.smoothed = false;
-      layer.setScale(3,3);
+      layer.setScale(this.game.zoom,this.game.zoom);
       this[name] = layer;
     }
 
@@ -23,20 +26,44 @@ export class Level {
     this.pathfinder.setGrid(this.walkable);
     this.pathfinder.setAcceptableTiles([0]);
     this.pathfinder.enableDiagonals();
-    // this.pathfinder.enableCornerCutting();
+  }
+
+  findLocations(type) {
+    return this.tilemap.objects['locations'].filter(
+      e => e.type === type);
+  }
+
+  spawn() {
+    this.findLocations('guard').forEach(l => {
+      let g = new Guard(this.game, {
+        x: l.x * this.game.zoom, y: l.y * this.game.zoom });
+      this.game.guards.push(g);
+      this.game.characters.push(g);
+    });
+    this.findLocations('intruder').forEach(l => {
+      let i = new Intruder(this.game, {
+        x: l.x * this.game.zoom, y: l.y * this.game.zoom });
+      this.game.intruder = i;
+      this.game.characters.push(i);
+    });
+    this.exits = this.findLocations('exit').map(l => {
+      return new Phaser.Point(
+        l.x * this.game.zoom, l.y * this.game.zoom);
+    });
+    this.hidingSpots = this.findLocations('hide').map(l => {
+      return new Phaser.Point(
+        l.x * this.game.zoom, l.y * this.game.zoom);
+    });
   }
 
   path(start, end, then) {
-    let scale = { x: 3, y: 3 };
+    let scale = { x: this.game.zoom, y: this.game.zoom };
     let startIndex = Level.tileIndex(start, this.tilemap, scale);
     let endIndex = Level.tileIndex(end, this.tilemap, scale);
     this.pathfinder.findPath(startIndex.x, startIndex.y, endIndex.x, endIndex.y, path => {
       if (path === null) return then(path);
-      let width = this.tilemap.tileWidth * scale.x;
-      let height = this.tilemap.tileHeight * scale.y;
-      return then(path.map(point => new Phaser.Point(
-        (point.x) * width + (width / 2),
-        (point.y) * height + (height / 2))));
+      return then(path.map(point => Level.tilePosition(
+        point.x, point.y, this.tilemap, this.game.zoom)));
     });
     this.pathfinder.calculate();
   }
@@ -47,6 +74,15 @@ export class Level {
       x: Math.floor(point.x / (tileWidth * scale.x)),
       y: Math.floor(point.y / (tileHeight * scale.y))
     };
+  }
+
+  static tilePosition(x, y, tilemap, zoom) {
+    let {tileWidth, tileHeight} = tilemap;
+    let width = tileWidth * zoom;
+    let height = tileHeight * zoom;
+    return new Phaser.Point(
+      x * width + (width / 2),
+      y * height + (height / 2));
   }
 
   static walkable(tilemap, layer) {

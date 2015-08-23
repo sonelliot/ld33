@@ -32,6 +32,124 @@
          "width":20,
          "x":0,
          "y":0
+        }, 
+        {
+         "height":20,
+         "name":"locations",
+         "objects":[
+                {
+                 "height":5,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"guard",
+                 "visible":true,
+                 "width":5,
+                 "x":42,
+                 "y":43
+                }, 
+                {
+                 "height":5,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"guard",
+                 "visible":true,
+                 "width":5,
+                 "x":205,
+                 "y":225
+                }, 
+                {
+                 "height":5,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"intruder",
+                 "visible":true,
+                 "width":5,
+                 "x":167,
+                 "y":160
+                }, 
+                {
+                 "height":5,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"exit",
+                 "visible":true,
+                 "width":5,
+                 "x":349,
+                 "y":94
+                }, 
+                {
+                 "height":5,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"exit",
+                 "visible":true,
+                 "width":5,
+                 "x":7,
+                 "y":186
+                }, 
+                {
+                 "ellipse":true,
+                 "height":5,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"hide",
+                 "visible":true,
+                 "width":6,
+                 "x":185,
+                 "y":29
+                }, 
+                {
+                 "ellipse":true,
+                 "height":5,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"hide",
+                 "visible":true,
+                 "width":6,
+                 "x":113,
+                 "y":237
+                }, 
+                {
+                 "ellipse":true,
+                 "height":5,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"hide",
+                 "visible":true,
+                 "width":6,
+                 "x":24,
+                 "y":120
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":20,
+         "x":0,
+         "y":0
         }],
  "orientation":"orthogonal",
  "properties":
