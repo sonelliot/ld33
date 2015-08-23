@@ -4,24 +4,26 @@ import {Guard} from './guard.js';
 import {Intruder} from './intruder.js';
 
 export class Level {
-  constructor(game, name, tilesets) {
+  constructor(game, name, tilesets, layers) {
     this.game = game;
 
     this.tilemap = game.add.tilemap(name);
     for (let tileset of tilesets)
       this.tilemap.addTilesetImage(tileset, tileset);
 
-    for (let name of ['ground', 'blocked', 'walls']) {
+    for (let name of layers) {
       let layer = this.tilemap.createLayer(name);
       layer.smoothed = false;
-      layer.setScale(this.game.zoom,this.game.zoom);
+      layer.setScale(this.game.zoom, this.game.zoom);
       this[name] = layer;
     }
 
-    this.tilemap.setCollisionBetween(1, 100000, true, this.blocked, true);
-    this.ground.resizeWorld();
+    // this.tilemap.setCollisionBetween(1, 100000, true, this.blocked, true);
+    // this.ground.resizeWorld();
 
-    this.walkable = Level.walkable(this.tilemap, this.blocked);
+    this.fog = Level.createFog(game, this.tilemap);
+
+    this.walkable = Level.walkable(this.tilemap, this.ground);
     this.pathfinder = new EasyStar.js();
     this.pathfinder.setGrid(this.walkable);
     this.pathfinder.setAcceptableTiles([0]);
@@ -56,19 +58,10 @@ export class Level {
     });
   }
 
-  fogOfWar(lights) {
-    const {width, height} = this.game;
-    let tiles = [];
-    for (let layer of this.tilemap.layers)
-      tiles.concat(layer.getTiles(0, 0, width, height));
-    for (let tile of tiles)
-      tile.alpha = 0.5;
-  }
-
   path(start, end, then) {
-    let scale = { x: this.game.zoom, y: this.game.zoom };
-    let startIndex = Level.tileIndex(start, this.tilemap, scale);
-    let endIndex = Level.tileIndex(end, this.tilemap, scale);
+    let zoom = this.game.zoom;
+    let startIndex = Level.tileIndex(start, this.tilemap, zoom);
+    let endIndex = Level.tileIndex(end, this.tilemap, zoom);
     this.pathfinder.findPath(startIndex.x, startIndex.y, endIndex.x, endIndex.y, path => {
       if (path === null) return then(path);
       return then(path.map(point => Level.tilePosition(
@@ -77,11 +70,39 @@ export class Level {
     this.pathfinder.calculate();
   }
 
-  static tileIndex(point, tilemap, scale) {
+  light(positions, radius) {
+    this.fog.forEach(r => r.forEach(t => t.alpha = 0.5));
+    for (let pos of positions)
+      this.lighten(pos, radius);
+  }
+
+  lighten(position, radius) {
+    let center = Level.tileIndex(position, this.tilemap, this.game.zoom);
+    let {width, height} = this.tilemap;
+
+    let w = {
+      start: Math.max(0, center.x - radius - 1),
+      end: Math.min(width, center.x + radius) };
+    let h = {
+      start: Math.max(0, center.y - radius),
+      end: Math.min(height, center.y + radius + 1) };
+
+    for (let x = w.start; x < w.end; x++) {
+      for (let y = h.start; y < h.end; y++) {
+        let tile = this.fog[x][y];
+        let d = Math.floor(
+          new Phaser.Point(x - center.x, y - center.y).getMagnitude());
+        if (d < radius - 1)
+          tile.alpha = 0.0;
+      }
+    }
+  }
+
+  static tileIndex(point, tilemap, zoom) {
     const {tileWidth, tileHeight} = tilemap;
     return {
-      x: Math.floor(point.x / (tileWidth * scale.x)),
-      y: Math.floor(point.y / (tileHeight * scale.y))
+      x: Math.floor(point.x / (tileWidth * zoom)),
+      y: Math.floor(point.y / (tileHeight * zoom))
     };
   }
 
@@ -96,11 +117,30 @@ export class Level {
 
   static walkable(tilemap, layer) {
     let tiles = [];
-    for (let y = 0; y < tilemap.width; y++) {
+    let {width, height} = tilemap;
+    let limit = Math.max(width, height);
+    for (let y = 0; y < limit; y++) {
       let row = [];
-      for (let x = 0; x < tilemap.height; x++) {
+      for (let x = 0; x < limit; x++) {
         let tile = tilemap.getTile(x, y, layer);
-        row.push((tile === null) ? 0 : 1);
+        row.push((tile === null) ? 1 : 0);
+      }
+      tiles.push(row);
+    }
+    return tiles;
+  }
+
+  static createFog(game, tilemap) {
+    let tiles = [];
+    for (let x = 0; x < tilemap.width; x++) {
+      let row = [];
+      for (let y = 0; y < tilemap.height; y++) {
+        let position = Level.tilePosition(x, y, tilemap, game.zoom);
+        let sprite = game.add.sprite(position.x, position.y, 'blank');
+        sprite.anchor.set(0.5, 0.5);
+        sprite.scale.set(game.zoom, game.zoom);
+        sprite.alpha = 0.5;
+        row.push(sprite);
       }
       tiles.push(row);
     }

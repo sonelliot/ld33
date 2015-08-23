@@ -6,16 +6,6 @@ export class Guard extends Character {
 
     this.facing = new Phaser.Point();
 
-    // this.sprite.main.events.onInputDown.add(_ => {
-    //   this.select();
-    // });
-
-    // this.sprite.cone = game.add.sprite(0, 0, 'cone', null, this.group);
-    // this.sprite.cone.alpha = 0.5;
-    // this.sprite.cone.anchor.set(0.525, 0.0);
-    // this.sprite.cone.smoothed = false;
-    // this.sprite.cone.scale.set(this.game.zoom,this.game.zoom);
-
     let pointer = game.input.activePointer;
     pointer.leftButton.onDown.add(_ => {
       if (this.selected === true) {
@@ -70,25 +60,19 @@ export class Guard extends Character {
     }
 
     this.selected = enable;
-    if (enable === true)
+    if (enable === true) {
       this.sprite.main.scale.set(this.game.zoom * 1.25, this.game.zoom * 1.25);
-    else
+
+      let {x, y} = this.sprite.main.position;
+      this.game.camera.follow(this.sprite.main);
+    }
+    else {
       this.sprite.main.scale.set(this.game.zoom,this.game.zoom);
+    }
   }
 
   update() {
     super.update();
-    // this.updateCone();
-  }
-
-  updateCone() {
-    let velocity = this.sprite.main.body.velocity;
-    if (velocity.getMagnitudeSq() > 0) {
-      let rotation = velocity.angle(new Phaser.Point(0,1)) + (Math.PI / 2);
-      this.sprite.cone.rotation = rotation;
-    }
-    this.sprite.cone.position.copyFrom(this.sprite.main.position);
-    this.sprite.cone.position.add(this.facing.x * 10, this.facing.y * 10);
   }
 
   stop() {

@@ -10,11 +10,10 @@ export class Intruder extends Character {
   update() {
     super.update();
 
-    this.updateWin();
-    this.updateLose();
-
-    this.updatePath();
-    this.updateVisible();
+    // this.updateWin();
+    // this.updateLose();
+    // this.updatePath();
+    // this.updateVisible();
   }
 
   updateWin() {

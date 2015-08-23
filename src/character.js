@@ -17,6 +17,8 @@ export class Character {
     this.sprite.main.smoothed = false;
     this.sprite.main.inputEnabled = true;
 
+    this.position = this.sprite.main.position;
+
     game.physics.enable(this.sprite.main, Phaser.Physics.ARCADE);
     this.sprite.main.body.collideWorldBounds = true;
     this.sprite.main.body.setSize(5,5,0,0);
