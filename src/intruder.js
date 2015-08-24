@@ -23,7 +23,7 @@ export class Intruder extends Character {
     this.bloodspurt.gravity = 0;
     this.bloodspurt.particleDrag.set(60, 60);
 
-    this.seen = game.add.audio('seen');
+    this.seen = game.add.audio('seen', 0.5);
   }
 
   hiding() {
@@ -60,8 +60,11 @@ export class Intruder extends Character {
     // this.updateSpeed(vis);
 
     if (!this.hidingSpot) {
-      this.hidingSpot = this.findHidingSpot();
-      this.updatePath(this.hidingSpot.position);
+      let spot = this.findHidingSpot();
+      if (spot) {
+        this.hidingSpot = spot;
+        this.updatePath(spot.position);
+      }
     }
 
     this.updateHiding();

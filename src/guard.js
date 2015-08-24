@@ -22,7 +22,7 @@ export class Guard extends Character {
       this.sprite.shotgun.position.set(this.position.x, this.position.y);
       this.sprite.shotgun.smoothed = false;
       this.sprite.shotgun.scale.set(game.zoom, game.zoom);
-      this.shot = game.add.audio('shotgun1', 0.1);
+      this.shot = game.add.audio('shotgun1', 0.5);
     }
 
     let pointer = game.input.activePointer;

@@ -37,6 +37,8 @@ export class PlayState {
       , 'lkp'
       , 'crate_open'
       , 'crate_closed'
+      , 'locker_open'
+      , 'locker_closed'
       , 'disk'
       , 'floor_tile'
       , 'pushover'
@@ -55,7 +57,6 @@ export class PlayState {
     const sounds = [
         'seen'
       , 'shotgun1'
-      , 'music'
     ];
     const tilemaps = [
         'map1'

@@ -49,11 +49,10 @@ export class Level {
       this.game.guards.push(g);
       this.game.characters.push(g);
     });
-    this.findLocationPositions('intruder').forEach(p => {
-      let i = new Intruder(this.game, p);
-      this.game.intruder = i;
-      this.game.characters.push(i);
-    });
+    let startingPoints = this.findLocationPositions('intruder');
+    let start = this.game.rnd.integerInRange(0, startingPoints.length-1);
+    this.game.intruder = new Intruder(this.game, startingPoints[start]);
+    this.game.characters.push(this.game.intruder);
     this.exits = this.findLocationPositions('exit');
     this.crates = this.findLocations('crate').reverse().map(l => {
       let closed = l.properties.closed === 'true';
@@ -61,11 +60,18 @@ export class Level {
         l.x * this.game.zoom, l.y * this.game.zoom);
       return new HidingSpot(this.game, 'crate', position, closed);
     });
+    this.lockers = this.findLocations('locker').reverse().map(l => {
+      let closed = l.properties.closed === 'true';
+      let position = new Phaser.Point(
+        l.x * this.game.zoom, l.y * this.game.zoom);
+      return new HidingSpot(this.game, 'locker', position, closed);
+    });
     this.fog = Level.createFog(game, this.tilemap);
   }
 
   hidingSpots() {
-    return this.crates.filter(cr => cr.hidable());
+    let all = this.crates.concat(this.lockers);
+    return all.filter(h => h.hidable());
   }
 
   path(start, end, then, grid=this.walkable) {
