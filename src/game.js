@@ -12,6 +12,7 @@ import {Intruder} from './intruder.js';
 import {CameraMan} from './cameraman.js';
 import {Menu} from './menu.js';
 import {Timer} from './timer.js';
+import {Question} from './question.js';
 
 function preload(game) {
   function sprite(name) {
@@ -29,6 +30,8 @@ function preload(game) {
     , 'blood2'
     , 'blood3'
     , 'cone'
+    , 'crate_open'
+    , 'crate_closed'
     , 'disk'
     , 'floor_tile'
     , 'guard'
@@ -36,6 +39,7 @@ function preload(game) {
     , 'menu'
     , 'shotgun'
     , 'bullet'
+    , 'question'
     , 'tileset_wall'
     , 'tileset_roof'
     , 'tilemap_ground'
@@ -121,6 +125,8 @@ function create(game) {
   game.actions.lose = lose;
 
   game.bullets = [];
+
+  game.question = new Question(game, new Phaser.Point(0,0));
 
   game.menu = {};
   game.menu.lose = new Menu(game, { title: 'YOU LOSE', button: 'RETRY' }, _ => {

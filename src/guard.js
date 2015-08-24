@@ -6,6 +6,7 @@ export class Guard extends Character {
     super(game, 'guard', position);
 
     this.fired = game.time.totalElapsedSeconds();
+    this.hidingSpot = null;
 
     this.sprite.shotgun = game.add.sprite(0, 0, 'shotgun', null, this.group);
     this.sprite.shotgun.anchor.set(0.5, 0.5);
@@ -53,6 +54,11 @@ export class Guard extends Character {
     }
   }
 
+  investigate(hidingSpot) {
+    this.hidingSpot = hidingSpot;
+    
+  }
+
   select(enable) {
     enable = (enable !== undefined) ? enable : !this.selected;
 
@@ -85,9 +91,9 @@ export class Guard extends Character {
       this.position.x, this.position.y - 8);
     this.sprite.shotgun.scale.copyFrom(this.scale);
 
-    let {position, alive} = this.game.intruder;
-    if (alive && Phaser.Point.distance(this.position, position) < 150)
-      this.fire(this.game.intruder.position);
+    // let {position, alive} = this.game.intruder;
+    // if (alive && Phaser.Point.distance(this.position, position) < 150)
+    //   this.fire(this.game.intruder.position);
   }
 
   fire(target) {

@@ -9,6 +9,8 @@ export class Intruder extends Character {
 
     const speed = 80;
 
+    this.hidingSpot = null;
+
     this.bloodspurt = game.add.emitter(0, 0, 50);
     this.bloodspurt.makeParticles(['blood1', 'blood2', 'blood3']);
     this.bloodspurt.setAll('smoothed', false);
@@ -20,16 +22,28 @@ export class Intruder extends Character {
     this.bloodspurt.particleDrag.set(60, 60);
   }
 
-  update() {
-    super.update();
+  hiding() {
+    return this.hidingSpot !== null && this.hidingSpot.occupied();
+  }
 
-    if (!this.alive)
+  update() {
+
+    this.updateVisible();
+    this.updateLose();
+
+    if (!this.alive || this.hiding())
       return;
 
-    this.updateLose();
-    this.updatePath();
-    this.updateVisible();
+    let spot = this.findHidingSpot();
+    if (spot) {
+      this.hidingSpot = spot;
+      this.updatePath(spot.position);
+    }
+
+    this.updateHiding();
     this.updateSpeed();
+
+    super.update();
   }
 
   updateSpeed() {
@@ -65,15 +79,24 @@ export class Intruder extends Character {
     let exit = this.closest(position, exits);
     let dist = Phaser.Point.distance(position, exit);
     if (dist < 50) {
-      this.game.actions.win();
+      this.game.actions.lose();
     }
   }
 
-  updatePath() {
+  updateHiding() {
+    if (this.hidingSpot && !this.hidingSpot.occupied()) {
+      let dist = Phaser.Point.distance(this.position, this.hidingSpot.position);
+      if (dist < 50) {
+        this.hidingSpot.occupy(this);
+        this.group.visible = false;
+        this.stop();
+      }
+    }
+  }
+
+  updatePath(dest) {
     let {level} = this.game;
-    let position = this.sprite.main.position;
-    let dest = this.selectDestination();
-    level.path(position, dest, path => {
+    level.path(this.position, dest, path => {
       if (path === null)
         return;
       this.path = path.splice(1);
@@ -96,10 +119,13 @@ export class Intruder extends Character {
   }
 
   selectDestination() {
-    let dest = this.closestExit();
-    if (dest === null)
-      dest = this.findHidingSpot();
-    return dest;
+    this.hidingSpot = this.findHidingSpot();
+    if (!this.hidingSpot) return null;
+    return this.hidingSpot.position;
+    // let dest = this.closestExit();
+    // if (dest === null)
+    //   dest = this.findHidingSpot();
+    // return dest;
   }
 
   closest(target, points) {
@@ -125,9 +151,21 @@ export class Intruder extends Character {
   }
 
   findHidingSpot() {
-    let {level: {hidingSpots}} = this.game;
+    let {level, guards} = this.game;
     let position = this.sprite.main.position;
-    return this.closest(position, hidingSpots);
+    let open = level.hidingSpots().filter(h => {
+      return guards.filter(g => {
+        let d = Phaser.Point.distance(h.position, g.position);
+        return d < 100;
+      }).length === 0;
+    });
+    let closest = open.reduce((a, b) => {
+      let d1 = Phaser.Point.distance(a, this.position);
+      let d2 = Phaser.Point.distance(b, this.position);
+      if (d1 < d2) return a;
+      else return b;
+    }, open[0]);
+    return closest;
   }
 
   updateLocations() {

@@ -38,6 +38,7 @@ export class Character {
 
   stop() {
     this.sprite.main.body.velocity.set(0,0);
+    this.path.length = 0;
   }
 
   update() {

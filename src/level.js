@@ -2,6 +2,7 @@ import * as EasyStar from 'easystarjs';
 
 import {Guard} from './guard.js';
 import {Intruder} from './intruder.js';
+import {HidingSpot} from './hiding-spot.js';
 
 export class Level {
   constructor(game, name, tilesets, layers) {
@@ -21,8 +22,6 @@ export class Level {
     this.tilemap.setCollisionBetween(1, 100000, true, this.blocked, true);
     // this.ground.resizeWorld();
 
-    this.fog = Level.createFog(game, this.tilemap);
-
     this.walkable = Level.walkable(this.tilemap, this.ground);
     this.pathfinder = new EasyStar.js();
     this.pathfinder.setGrid(this.walkable);
@@ -31,31 +30,39 @@ export class Level {
   }
 
   findLocations(type) {
-    return this.tilemap.objects['locations'].filter(
-      e => e.type === type);
+    return this.tilemap.objects['locations']
+      .filter(e => e.type === type);
+  }
+
+  findLocationPositions(type) {
+    let {zoom} = this.game;
+    return this.findLocations(type)
+      .map(l => new Phaser.Point(l.x * zoom, l.y * zoom));
   }
 
   spawn() {
-    this.findLocations('guard').forEach(l => {
-      let g = new Guard(this.game, {
-        x: l.x * this.game.zoom, y: l.y * this.game.zoom });
+    this.findLocationPositions('guard').forEach(p => {
+      let g = new Guard(this.game, p);
       this.game.guards.push(g);
       this.game.characters.push(g);
     });
-    this.findLocations('intruder').forEach(l => {
-      let i = new Intruder(this.game, {
-        x: l.x * this.game.zoom, y: l.y * this.game.zoom });
+    this.findLocationPositions('intruder').forEach(p => {
+      let i = new Intruder(this.game, p);
       this.game.intruder = i;
       this.game.characters.push(i);
     });
-    this.exits = this.findLocations('exit').map(l => {
-      return new Phaser.Point(
+    this.exits = this.findLocationPositions('exit');
+    this.crates = this.findLocations('crate').reverse().map(l => {
+      let closed = l.properties.closed === 'true';
+      let position = new Phaser.Point(
         l.x * this.game.zoom, l.y * this.game.zoom);
+      return new HidingSpot(this.game, 'crate', position, closed);
     });
-    this.hidingSpots = this.findLocations('hide').map(l => {
-      return new Phaser.Point(
-        l.x * this.game.zoom, l.y * this.game.zoom);
-    });
+    this.fog = Level.createFog(game, this.tilemap);
+  }
+
+  hidingSpots() {
+    return this.crates.filter(cr => cr.hidable());
   }
 
   path(start, end, then) {
