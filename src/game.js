@@ -31,6 +31,8 @@ function preload(game) {
     , 'guard'
     , 'intruder'
     , 'menu'
+    , 'shotgun'
+    , 'bullet'
     , 'tileset_wall'
     , 'tileset_roof'
     , 'tilemap_ground'
@@ -115,6 +117,8 @@ function create(game) {
   game.actions.win = win;
   game.actions.lose = lose;
 
+  game.bullets = [];
+
   game.menu = {};
   game.menu.lose = new Menu(game, { title: 'YOU LOSE', button: 'RETRY' }, _ => {
     game.menu.lose.setVisible(false);
@@ -128,6 +132,8 @@ function create(game) {
   game.timer = new Timer(game, 5.0, _ => lose());
   game.levelName = game.add.text(15, 10, 'level: ', {
       font: '14px Pixel', fill: 'white' });
+
+  game.collidable = game.add.group();
 
   loadLevel(game, 'map2');
 
@@ -153,8 +159,8 @@ function update(game) {
     character.update();
     game.physics.arcade.collide(character.sprite.main, game.level.blocked);
   }
-  
-  game.level.light(game.characters.map(c => c.position), 5);
+
+  game.level.light(game.guards.map(c => c.position), 5);
   game.cameraman.update();
   game.timer.update();
 }

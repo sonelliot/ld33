@@ -1,10 +1,17 @@
 import {Character} from './character.js';
+import {Bullet} from './bullet.js';
 
 export class Guard extends Character {
   constructor(game, position={x: 0, y: 0}) {
     super(game, 'guard', position);
 
-    this.facing = new Phaser.Point();
+    this.fired = game.time.totalElapsedSeconds();
+
+    this.sprite.shotgun = game.add.sprite(0, 0, 'shotgun', null);
+    this.sprite.shotgun.anchor.set(0.5, 0.5);
+    this.sprite.shotgun.position.set(this.position.x, this.position.y);
+    this.sprite.shotgun.smoothed = false;
+    this.sprite.shotgun.scale.set(game.zoom, game.zoom);
 
     let pointer = game.input.activePointer;
     pointer.leftButton.onDown.add(_ => {
@@ -73,6 +80,25 @@ export class Guard extends Character {
 
   update() {
     super.update();
+
+    this.sprite.shotgun.position.set(
+      this.position.x, this.position.y - 8);
+    this.sprite.shotgun.scale.copyFrom(this.scale);
+
+    this.fire(this.game.intruder.position);
+  }
+
+  fire(target) {
+    let now = this.game.time.totalElapsedSeconds();
+    let since = now - this.fired;
+    if (since > 1.0) {
+      let dirn = Phaser.Point.subtract(target, this.position);
+      dirn.normalize();
+
+      this.fired = this.game.time.totalElapsedSeconds();
+      this.game.bullets.push(new Bullet(
+        this.game, this.position, dirn, 300.0));
+    }
   }
 
   stop() {

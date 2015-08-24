@@ -18,7 +18,7 @@ export class Level {
       this[name] = layer;
     }
 
-    // this.tilemap.setCollisionBetween(1, 100000, true, this.blocked, true);
+    this.tilemap.setCollisionBetween(1, 100000, true, this.blocked, true);
     // this.ground.resizeWorld();
 
     this.fog = Level.createFog(game, this.tilemap);
