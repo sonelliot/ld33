@@ -19,6 +19,10 @@ export class PausedState {
       game.levelId++;
       game.state.start('play');
     });
+    this.menu.complete = new Menu(game, { title: 'FINISHED', button: 'RESTART' }, _ => {
+      game.levelId = 1;
+      game.state.start('play');
+    });
 
     let menu = this.menu[this.reason || 'win'];
     menu.setVisible(true);

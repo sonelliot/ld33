@@ -12,7 +12,6 @@ export class PlayState {
     this.name = 'play';
     this.game = game;
     this.paused = false;
-    this.level = 'map2';
   }
 
   preload(game) {
@@ -72,17 +71,21 @@ export class PlayState {
   }
 
   init (level) {
-    this.level = level;
   }
 
   create(game) {
+    game.levelMax = 1;
+
     game.stage.backgroundColor = 0x363636;
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.zoom = 2;
 
     game.actions = {};
     game.actions.win = _ => {
-      game.state.start('paused', true, false, 'win');
+      if (game.levelId === game.levelMax)
+        game.state.start('paused', true, false, 'complete');
+      else
+        game.state.start('paused', true, false, 'win');
     };
     game.actions.lose = _ => {
       game.state.start('paused', true, false, 'lose');
