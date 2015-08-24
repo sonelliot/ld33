@@ -146,7 +146,7 @@ export class Guard extends Character {
       this.shot.play();
       this.fired = this.game.time.totalElapsedSeconds();
       this.game.bullets.push(new Bullet(
-        this.game, start, dirn, 300.0));
+        this.game, start, dirn, 600.0));
     }
   }
 

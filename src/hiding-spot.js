@@ -21,7 +21,7 @@ export class HidingSpot {
 
     this.sound = game.add.audio('open', 0.5);
 
-    const SEARCH_RADIUS = 120;
+    const SEARCH_RADIUS = 150;
 
     this.closed.events.onInputOver.add(_ => {
       let {active} = this.game.guards;
