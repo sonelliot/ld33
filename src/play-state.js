@@ -53,10 +53,15 @@ export class PlayState {
       , 'tileset_roof'
       , 'tilemap_ground'
       , 'tilemap_crate'
+      , 'one'
+      , 'two'
+      , 'three'
     ];
     const sounds = [
         'seen'
       , 'shotgun1'
+      , 'open'
+      , 'beep'
     ];
     const tilemaps = [
         'map1'
@@ -75,7 +80,7 @@ export class PlayState {
   }
 
   create(game) {
-    game.levelMax = 1;
+    game.levelMax = 2;
 
     game.stage.backgroundColor = 0x363636;
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -103,8 +108,9 @@ export class PlayState {
       font: '14px Pixel', fill: 'white' });
     game.levelName.fixedToCamera = true;
 
-    game.collidable = game.add.group();
+    game.sortable = game.add.group();
 
+    this.clear(this.game);
     this.loadLevel(game, 'map' + game.levelId);
 
     let numbers = ['ONE', 'TWO', 'THREE', 'FOUR'];
@@ -126,6 +132,9 @@ export class PlayState {
   update(game) {
     if (this.paused === true)
       return;
+
+    game.world.bringToTop(game.sortable);
+    game.sortable.sort();
 
     for (let character of game.characters) {
       character.update();
@@ -176,9 +185,17 @@ export class PlayState {
   }
 
   clear(game) {
-    if (game.characters && game.characters.length > 0)
-      game.characters.forEach(c => c.group.destroy());
-    game.characters = null; game.guards = null;
+    delete game.characters;
+    delete game.guards;
+    delete game.intruder;
+
+    let pointer = game.input.activePointer;
+    pointer.leftButton.onDown.removeAll();
+
+    if (game.sortable.length > 0) {
+      game.sortable.destroy();
+      game.sortable = game.add.group();
+    }
 
     if (game.level) {
       game.level.tilemap.destroy();

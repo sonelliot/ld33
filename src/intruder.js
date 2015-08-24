@@ -1,8 +1,8 @@
 import {Character} from './character.js';
 
 export class Intruder extends Character {
-  constructor(game, position={x:0, y:0}) {
-    super(game, 'intruder', position);
+  constructor(game, position={x:0, y:0}, group) {
+    super(game, 'intruder', position, group);
     this.speed = 120;
     this.locations = {};
     this.alive = true;
@@ -121,13 +121,15 @@ export class Intruder extends Character {
       let dist = Phaser.Point.distance(this.position, this.hidingSpot.position);
       if (dist < 50) {
         this.hidingSpot.occupy(this);
-        this.group.visible = false;
+        this.sprite.main.visible = false;
         this.stop();
       }
     }
   }
 
   updatePath(dest) {
+    if (!dest) return;
+    console.log(dest);
     let {level} = this.game;
     level.path(this.position, dest, path => {
       if (path === null)

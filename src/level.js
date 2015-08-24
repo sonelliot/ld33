@@ -8,6 +8,8 @@ export class Level {
   constructor(game, name, tilesets, layers) {
     this.game = game;
 
+    this.group = this.game.sortable;
+
     this.tilemap = game.add.tilemap(name);
     for (let tileset of tilesets)
       this.tilemap.addTilesetImage(tileset, tileset);
@@ -20,7 +22,6 @@ export class Level {
     }
 
     this.tilemap.setCollisionBetween(1, 100000, true, this.blocked, true);
-    // this.ground.resizeWorld();
 
     this.walkable = Level.walkable(this.tilemap, this.ground);
     this.pathfinder = new EasyStar.js();
@@ -41,17 +42,18 @@ export class Level {
   }
 
   spawn() {
+    let i = 0;
     this.findLocations('guard').forEach(l => {
       let type = l.properties.guard;
       let p = new Phaser.Point(
         l.x * this.game.zoom, l.y * this.game.zoom);
-      let g = new Guard(this.game, type, p);
+      let g = new Guard(this.game, type, p, i++, this.group);
       this.game.guards.push(g);
       this.game.characters.push(g);
     });
     let startingPoints = this.findLocationPositions('intruder');
     let start = this.game.rnd.integerInRange(0, startingPoints.length-1);
-    this.game.intruder = new Intruder(this.game, startingPoints[start]);
+    this.game.intruder = new Intruder(this.game, startingPoints[start], this.group);
     this.game.characters.push(this.game.intruder);
     this.exits = this.findLocationPositions('exit');
     this.crates = this.findLocations('crate').reverse().map(l => {
@@ -139,10 +141,11 @@ export class Level {
   }
 
   static tileIndex(point, tilemap, zoom) {
+    const {width, height} = tilemap;
     const {tileWidth, tileHeight} = tilemap;
     return {
-      x: Math.floor(point.x / (tileWidth * zoom)),
-      y: Math.floor(point.y / (tileHeight * zoom))
+      x: Math.max(0, Math.min(width, Math.floor(point.x / (tileWidth * zoom)))),
+      y: Math.max(0, Math.min(height, Math.floor(point.y / (tileHeight * zoom))))
     };
   }
 

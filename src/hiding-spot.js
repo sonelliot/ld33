@@ -1,24 +1,25 @@
 
 export class HidingSpot {
-  constructor(game, type, position, closed) {
+  constructor(game, type, position, closed, group) {
     this.game = game;
-    this.group = game.add.group();
 
     this.position = position;
     this.occupant = null;
 
-    this.open = game.add.sprite(position.x, position.y, type + '_open', null, this.group);
+    this.open = game.add.sprite(position.x, position.y, type + '_open', null, group);
     this.open.anchor.set(0, 1);
     this.open.smoothed = false;
     this.open.scale.set(game.zoom, game.zoom);
     this.open.visible = !closed;
 
-    this.closed = game.add.sprite(position.x, position.y, type + '_closed', null, this.group);
+    this.closed = game.add.sprite(position.x, position.y, type + '_closed', null, group);
     this.closed.anchor.set(0, 1);
     this.closed.smoothed = false;
     this.closed.scale.set(game.zoom, game.zoom);
     this.closed.visible = closed;
     this.closed.inputEnabled = true;
+
+    this.sound = game.add.audio('open', 0.5);
 
     const SEARCH_RADIUS = 120;
 
@@ -72,8 +73,9 @@ export class HidingSpot {
   search() {
     this.open.visible = true;
     this.closed.visible = false;
+    this.sound.play();
     if (this.occupant) {
-      this.occupant.group.visible = true;
+      this.occupant.sprite.main.visible = true;
       this.occupant.hidingSpot = null;
       this.occupant = null;
     }
