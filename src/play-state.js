@@ -66,6 +66,7 @@ export class PlayState {
     const tilemaps = [
         'map1'
       , 'map2'
+      , 'map3'
     ];
 
     for (let img of images)

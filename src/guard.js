@@ -23,6 +23,12 @@ export class Guard extends Character {
 
     this.beep = game.add.audio('beep', 0.2);
 
+    this.pulse = game.add.tween(this.sprite.main.scale);
+    this.pulse.to({
+      x: game.zoom * 1.1, y: game.zoom * 1.1 }, 1000, Phaser.Easing.Cubic.In, false, 0, -1, true);
+    this.pulse.start();
+    this.pulse.pause();
+
     if (params.armed) {
       this.sprite.shotgun = game.add.sprite(0, 0, 'shotgun', null, group);
       this.sprite.shotgun.anchor.set(0.5, 0.5);
@@ -97,14 +103,16 @@ export class Guard extends Character {
 
     this.selected = enable;
     if (enable === true) {
-      this.sprite.main.scale.set(this.game.zoom * 1.25, this.game.zoom * 1.25);
+      // this.sprite.main.scale.set(this.game.zoom * 1.25, this.game.zoom * 1.25);
+      this.pulse.resume();
 
       let {x, y} = this.sprite.main.position;
       this.game.camera.follow(this.sprite.main);
       this.beep.play();
     }
     else {
-      this.sprite.main.scale.set(this.game.zoom,this.game.zoom);
+      // this.sprite.main.scale.set(this.game.zoom,this.game.zoom);
+      this.pulse.pause();
     }
   }
 
