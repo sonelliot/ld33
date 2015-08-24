@@ -13,10 +13,11 @@ export class PausedState {
   create (game) {
     this.menu = {};
     this.menu.lose = new Menu(game, { title: 'YOU LOSE', button: 'RETRY' }, _ => {
-      game.state.start('play', true, false, 'map2');
+      game.state.start('play');
     });
     this.menu.win = new Menu(game, { title: 'YOU WIN', button: 'NEXT' }, _ => {
-      game.state.start('play', true, false, 'map2');
+      game.levelId++;
+      game.state.start('play');
     });
 
     let menu = this.menu[this.reason || 'win'];

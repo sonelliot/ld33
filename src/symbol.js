@@ -20,17 +20,21 @@ export class Sym {
       x: factor, y: factor }, 500, Phaser.Easing.Cubic.In, false, 0, -1, true);
     this.pulse.start();
     this.pulse.pause();
+
+    this.fade = game.add.tween(this.sprite);
+    this.fade.to({ alpha: 0 }, 500, Phaser.Easing.Cubic.Out);
   }
 
   show(position) {
     this.game.world.bringToTop(this.group);
     this.position.copyFrom(position);
     this.sprite.visible = true;
+    this.sprite.alpha = 1;
     this.pulse.resume();
   }
 
   hide() {
-    this.sprite.visible = false;
     this.pulse.pause();
+    this.fade.start();
   }
 };

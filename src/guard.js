@@ -1,5 +1,6 @@
 import {Character} from './character.js';
 import {Bullet} from './bullet.js';
+import {Sym} from './symbol.js';
 
 export class Guard extends Character {
   constructor(game, type, position={x: 0, y: 0}) {
@@ -21,7 +22,7 @@ export class Guard extends Character {
       this.sprite.shotgun.position.set(this.position.x, this.position.y);
       this.sprite.shotgun.smoothed = false;
       this.sprite.shotgun.scale.set(game.zoom, game.zoom);
-      this.shot = game.add.audio('shotgun1');
+      this.shot = game.add.audio('shotgun1', 0.1);
     }
 
     let pointer = game.input.activePointer;
@@ -42,11 +43,11 @@ export class Guard extends Character {
 
   params(type) {
     if (type === 'pushover')
-      return { speed: 60, armed: false, visibility: 4 };
+      return { speed: 80, armed: false, visibility: 4 };
     else if (type === 'capable')
-      return { speed: 60, armed: false, visibility: 4 };
+      return { speed: 80, armed: false, visibility: 4 };
     else if (type === 'badass')
-      return { speed: 60, armed: true, visibility: 4 };
+      return { speed: 80, armed: true, visibility: 4 };
     return null;
   }
 

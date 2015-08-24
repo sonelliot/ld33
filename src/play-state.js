@@ -54,11 +54,13 @@ export class PlayState {
       , 'tilemap_crate'
     ];
     const sounds = [
-      'seen'
+        'seen'
       , 'shotgun1'
+      , 'music'
     ];
     const tilemaps = [
-      'map2'
+        'map1'
+      , 'map2'
     ];
 
     for (let img of images)
@@ -99,7 +101,7 @@ export class PlayState {
 
     game.collidable = game.add.group();
 
-    this.loadLevel(game, this.level || 'map2');
+    this.loadLevel(game, 'map' + game.levelId);
 
     let numbers = ['ONE', 'TWO', 'THREE', 'FOUR'];
     for (let i = 0; i < game.guards.length; i++) {
@@ -112,6 +114,9 @@ export class PlayState {
 
     game.cameraman = new CameraMan(game);
     game.world.resize(2000, 2000);
+
+    this.bgm = game.add.audio('music', 1, true);
+    // this.bgm.play();
   }
 
   update(game) {

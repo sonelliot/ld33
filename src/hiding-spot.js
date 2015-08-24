@@ -20,7 +20,7 @@ export class HidingSpot {
     this.closed.visible = closed;
     this.closed.inputEnabled = true;
 
-    const SEARCH_RADIUS = 80;
+    const SEARCH_RADIUS = 120;
 
     this.closed.events.onInputOver.add(_ => {
       let {active} = this.game.guards;
