@@ -7,7 +7,7 @@ export class Guard extends Character {
 
     this.fired = game.time.totalElapsedSeconds();
 
-    this.sprite.shotgun = game.add.sprite(0, 0, 'shotgun', null);
+    this.sprite.shotgun = game.add.sprite(0, 0, 'shotgun', null, this.group);
     this.sprite.shotgun.anchor.set(0.5, 0.5);
     this.sprite.shotgun.position.set(this.position.x, this.position.y);
     this.sprite.shotgun.smoothed = false;

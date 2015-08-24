@@ -9,6 +9,7 @@ export class Bullet {
     this.target = game.intruder.sprite.main;
 
     this.sprite = game.add.sprite(x, y, 'bullet');
+    this.sprite.pivot.set(0, 0.5);
     this.sprite.scale.set(game.zoom, game.zoom);
     game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
     this.sprite.body.collideWorldBounds = true;

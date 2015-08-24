@@ -1,15 +1,16 @@
 const uuid = require('uuid').v4;
 
 export class Character {
-  constructor(game, key, position, group) {
+  constructor(game, key, position) {
     this.id = uuid();
     this.game = game;
     this.speed = 100.0;
     this.path = [];
 
+    this.group = game.add.group();
     this.sprite = {};
 
-    this.sprite.main = game.add.sprite(0, 0, key, null, group);
+    this.sprite.main = game.add.sprite(0, 0, key, null, this.group);
     this.sprite.main.position.set(position.x, position.y);
     this.sprite.main.scale.set(this.game.zoom,this.game.zoom);
     this.sprite.main.anchor.set(0.5, 1.0);
@@ -40,7 +41,7 @@ export class Character {
   }
 
   update() {
-    this.game.debug.body(this.sprite.main);
+    // this.game.debug.body(this.sprite.main);
 
     if (this.path.length > 0) {
       let next = this.path[0];

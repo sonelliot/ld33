@@ -23,10 +23,26 @@ export class Intruder extends Character {
   update() {
     super.update();
 
-    // this.updateWin();
-    // this.updateLose();
-    // this.updatePath();
-    // this.updateVisible();
+    if (!this.alive)
+      return;
+
+    this.updateLose();
+    this.updatePath();
+    this.updateVisible();
+    this.updateSpeed();
+  }
+
+  updateSpeed() {
+    let position = this.sprite.main.position;
+    let closest = this.closest(position, this.game.guards.map(
+      g => g.sprite.main.position));
+    let dist = Phaser.Point.distance(position, closest);
+    if (dist < 150) {
+      this.speed = 120.0;
+    }
+    else {
+      this.speed = 50.0;
+    }
   }
 
   die() {
@@ -39,18 +55,8 @@ export class Intruder extends Character {
     this.bloodspurt.start(true, 0, null, 50);
     
     let timer = this.game.time.create(true);
-    timer.add(1000, _ => this.game.actions.lose());
+    timer.add(1000, _ => this.game.actions.win());
     timer.start();
-  }
-
-  updateWin() {
-    let position = this.sprite.main.position;
-    let closest = this.closest(position, this.game.guards.map(
-      g => g.sprite.main.position));
-    let dist = Phaser.Point.distance(position, closest);
-    if (dist < 50) {
-      this.game.actions.win();
-    }
   }
 
   updateLose() {
@@ -59,7 +65,7 @@ export class Intruder extends Character {
     let exit = this.closest(position, exits);
     let dist = Phaser.Point.distance(position, exit);
     if (dist < 50) {
-      this.game.actions.lose();
+      this.game.actions.win();
     }
   }
 
