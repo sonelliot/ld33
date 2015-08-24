@@ -99,7 +99,7 @@
                  "name":"",
                  "properties":
                     {
-
+                     "guard":"pushover"
                     },
                  "rotation":0,
                  "type":"guard",
@@ -235,6 +235,38 @@
                  "width":18,
                  "x":18,
                  "y":65
+                }, 
+                {
+                 "gid":89,
+                 "height":8,
+                 "id":34,
+                 "name":"",
+                 "properties":
+                    {
+                     "guard":"capable"
+                    },
+                 "rotation":0,
+                 "type":"guard",
+                 "visible":true,
+                 "width":7,
+                 "x":324,
+                 "y":156
+                }, 
+                {
+                 "gid":89,
+                 "height":8,
+                 "id":35,
+                 "name":"",
+                 "properties":
+                    {
+                     "guard":"badass"
+                    },
+                 "rotation":0,
+                 "type":"guard",
+                 "visible":true,
+                 "width":7,
+                 "x":126,
+                 "y":182
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -254,7 +286,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":34,
+ "nextobjectid":36,
  "orientation":"orthogonal",
  "properties":
     {

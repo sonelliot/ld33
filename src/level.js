@@ -41,8 +41,11 @@ export class Level {
   }
 
   spawn() {
-    this.findLocationPositions('guard').forEach(p => {
-      let g = new Guard(this.game, p);
+    this.findLocations('guard').forEach(l => {
+      let type = l.properties.guard;
+      let p = new Phaser.Point(
+        l.x * this.game.zoom, l.y * this.game.zoom);
+      let g = new Guard(this.game, type, p);
       this.game.guards.push(g);
       this.game.characters.push(g);
     });

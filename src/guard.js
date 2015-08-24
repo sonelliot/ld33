@@ -2,10 +2,14 @@ import {Character} from './character.js';
 import {Bullet} from './bullet.js';
 
 export class Guard extends Character {
-  constructor(game, position={x: 0, y: 0}, visibility=5) {
-    super(game, 'guard', position);
+  constructor(game, type, position={x: 0, y: 0}) {
+    super(game, type, position);
 
-    this.visibility = visibility;
+    let params = this.params(type);
+
+    this.speed = params.speed;
+    this.visibility = params.visibility;
+    this.fireRate = params.fireRate;
 
     this.fired = game.time.totalElapsedSeconds();
     this.hidingSpot = null;
@@ -42,6 +46,16 @@ export class Guard extends Character {
       d.visible = false;
       this.disks.push(d);
     }
+  }
+
+  params(type) {
+    if (type === 'pushover')
+      return { speed: 100, fireRate: 2.0, visibility: 5 };
+    else if (type === 'capable')
+      return { speed: 100, fireRate: 1.0, visibility: 5 };
+    else if (type === 'badass')
+      return { speed: 100, fireRate: 0.5, visibility: 7 };
+    return null;
   }
 
   canSee(target) {
@@ -101,16 +115,16 @@ export class Guard extends Character {
       this.position.x, this.position.y - 8);
     this.sprite.shotgun.scale.copyFrom(this.scale);
 
-    // let {position, alive} = this.game.intruder;
-    // let hidden = this.game.intruder.hiding();
-    // if (!hidden && alive && Phaser.Point.distance(this.position, position) < 150)
-    //   this.fire(this.game.intruder.position);
+    let {position, alive} = this.game.intruder;
+    let hidden = this.game.intruder.hiding();
+    if (!hidden && alive && Phaser.Point.distance(this.position, position) < 150)
+      this.fire(this.game.intruder.position);
   }
 
   fire(target) {
     let now = this.game.time.totalElapsedSeconds();
     let since = now - this.fired;
-    if (since > 1.0) {
+    if (since > this.fireRate) {
       let dirn = Phaser.Point.subtract(target, this.position);
       dirn.normalize();
       
