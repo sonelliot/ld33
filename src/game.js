@@ -25,6 +25,9 @@ function preload(game) {
       'box_tile'
     , 'button'
     , 'blank'
+    , 'blood1'
+    , 'blood2'
+    , 'blood3'
     , 'cone'
     , 'disk'
     , 'floor_tile'
@@ -158,6 +161,10 @@ function update(game) {
   for (let character of game.characters) {
     character.update();
     game.physics.arcade.collide(character.sprite.main, game.level.blocked);
+  }
+
+  for (let bullet of game.bullets) {
+    bullet.update();
   }
 
   game.level.light(game.guards.map(c => c.position), 5);

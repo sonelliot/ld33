@@ -21,7 +21,7 @@ export class Character {
 
     game.physics.enable(this.sprite.main, Phaser.Physics.ARCADE);
     this.sprite.main.body.collideWorldBounds = true;
-    this.sprite.main.body.setSize(5,5,0,0);
+    // this.sprite.main.body.setSize(5,5,0,0);
   }
 
   move(dest) {
@@ -40,7 +40,7 @@ export class Character {
   }
 
   update() {
-    // this.game.debug.body(this.sprite.main);
+    this.game.debug.body(this.sprite.main);
 
     if (this.path.length > 0) {
       let next = this.path[0];

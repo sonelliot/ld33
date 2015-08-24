@@ -3,8 +3,21 @@ import {Character} from './character.js';
 export class Intruder extends Character {
   constructor(game, position={x:0, y:0}) {
     super(game, 'intruder', position);
-    this.speed = 50;1
+    this.speed = 50;
     this.locations = {};
+    this.alive = true;
+
+    const speed = 80;
+
+    this.bloodspurt = game.add.emitter(0, 0, 50);
+    this.bloodspurt.makeParticles(['blood1', 'blood2', 'blood3']);
+    this.bloodspurt.setAll('smoothed', false);
+    this.bloodspurt.setRotation(0,0);
+    this.bloodspurt.setXSpeed(-speed, speed);
+    this.bloodspurt.setYSpeed(-speed, speed);
+    this.bloodspurt.setScale(1, 4, 1, 4, 100, Phaser.Easing.Cubic.In);
+    this.bloodspurt.gravity = 0;
+    this.bloodspurt.particleDrag.set(60, 60);
   }
 
   update() {
@@ -14,6 +27,20 @@ export class Intruder extends Character {
     // this.updateLose();
     // this.updatePath();
     // this.updateVisible();
+  }
+
+  die() {
+    if (!this.alive)
+      return;
+
+    this.alive = false;
+    this.bloodspurt.position.set(
+      this.position.x, this.position.y - 20);
+    this.bloodspurt.start(true, 0, null, 50);
+    
+    let timer = this.game.time.create(true);
+    timer.add(1000, _ => this.game.actions.lose());
+    timer.start();
   }
 
   updateWin() {
