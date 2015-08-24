@@ -83,8 +83,6 @@ export class PlayState {
   }
 
   create(game) {
-    game.levelMax = 2;
-
     game.stage.backgroundColor = 0x363636;
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.zoom = 2;

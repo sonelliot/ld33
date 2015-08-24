@@ -7,13 +7,47 @@
        font-family: Pixel;
        src: url(font.ttf);
      }
+     body {
+       background: #363636;
+       color: white;
+     }
      div {
        font-family: Pixel;
+       margin: auto;
+       width: 800px;
+     }
+     img {
+       display: block;
+       margin-left: auto;
+       margin-right: auto;
+     }
+     .padded {
+       padding: 20px;
+     }
+     #game {
      }
     </style>
   </head>
   <body>
-    <div>Ludum Dare #33</div>
+    <div class="padded">
+      <img src="logo.png">
+    </div>
+    <div>
+      <div id="game"></div>
+    </div>
+    <div class="padded">
+      <p>
+        <div><strong>Objective:</strong></div>
+        <div>Find the intruder and kill him within the minute!</div>
+      </p>
+      <p>
+        <div><strong>Controls:</strong></div>
+        <div>- Numbers 1, 2, 3 to select your guard.</div>
+        <div>- Click to move once guard is selected.</div>
+        <div>- Shift + Click to shoot in direction of cursor.</div>
+        <div>- <i>Press 'm' to toggle music on and off!</i></div>
+      </p>
+    </div>
     <script src="phaser.js"></script>
     <script src="game.js"></script>
   </body>
