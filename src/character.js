@@ -23,6 +23,30 @@ export class Character {
     game.physics.enable(this.sprite.main, Phaser.Physics.ARCADE);
     this.sprite.main.body.collideWorldBounds = true;
     // this.sprite.main.body.setSize(5,5,0,0);
+
+    this.disks = [];
+    for (let i = 0; i < 100; i++) {
+      let d = game.add.sprite(0, 0, 'disk');
+      let f = game.zoom * 0.75;
+      d.anchor.set(0.5, 0.5);
+      d.scale.set(f,f);
+      d.visible = false;
+      this.disks.push(d);
+    }
+  }
+
+  hidePath() {
+    this.disks.forEach(d => d.visible = false);
+  }
+
+  showPath(path) {
+    this.hidePath();
+    for (let i =0; i < path.length; i++) {
+      let point = path[i];
+      let disk = this.disks[i];
+      disk.position.set(point.x, point.y);
+      disk.visible = true;
+    }
   }
 
   move(dest) {
@@ -31,7 +55,7 @@ export class Character {
     let dirn = Phaser.Point.normalize(between);
     this.facing = dirn;
     sprite.body.velocity.set(this.speed * dirn.x, this.speed * dirn.y);
-    if (between.getMagnitude() < 10.0)
+    if (between.getMagnitude() < 20.0)
       return true;
     return false;
   }

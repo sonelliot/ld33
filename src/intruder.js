@@ -6,6 +6,7 @@ export class Intruder extends Character {
     this.speed = 50;
     this.locations = {};
     this.alive = true;
+    this.exit = null;
 
     const speed = 80;
 
@@ -35,6 +36,7 @@ export class Intruder extends Character {
     this.game.bang.show(new Phaser.Point(
       this.position.x, this.position.y - 50
     ));
+    this.hidingSpot = null;
   }
 
   update() {
@@ -57,13 +59,14 @@ export class Intruder extends Character {
     this.updateVisible(vis);
     this.updateSpeed(vis);
 
-    let spot = this.findHidingSpot();
-    if (spot) {
-      this.hidingSpot = spot;
-      this.updatePath(spot.position);
+    if (!this.hidingSpot) {
+      this.hidingSpot = this.findHidingSpot();
+      this.updatePath(this.hidingSpot.position);
     }
 
     this.updateHiding();
+
+    // this.showPath(this.path);
 
     super.update();
   }
@@ -104,13 +107,10 @@ export class Intruder extends Character {
   }
 
   updateLose() {
-    let position = this.sprite.main.position;
-    let {level: {exits}} = this.game;
-    let exit = this.closest(position, exits);
-    let dist = Phaser.Point.distance(position, exit);
-    if (dist < 50) {
+    if (!this.exit) return;
+    let dist = Phaser.Point.distance(this.position, this.exit);
+    if (dist < 50)
       this.game.actions.lose();
-    }
   }
 
   updateHiding() {
@@ -153,16 +153,6 @@ export class Intruder extends Character {
       this.sprite.main.alpha = 0.0;
   }
 
-  selectDestination() {
-    this.hidingSpot = this.findHidingSpot();
-    if (!this.hidingSpot) return null;
-    return this.hidingSpot.position;
-    // let dest = this.closestExit();
-    // if (dest === null)
-    //   dest = this.findHidingSpot();
-    // return dest;
-  }
-
   closest(target, points) {
     return points.reduce((a, b) => {
       let d1 = Phaser.Point.distance(a, target);
@@ -174,48 +164,62 @@ export class Intruder extends Character {
 
   closestExit() {
     let {level: {exits}, guards} = this.game;
-    let guardPositions = guards.map(g => g.sprite.main.position);
+    let guardPositions = guards.map(g => g.position);
     let open = exits.filter(e => {
       let distances = guardPositions.map(p => Phaser.Point.distance(e, p));
       let closest = distances.reduce((a,b) => Math.min(a, b), Number.MAX_VALUE);
       return closest > 150;
     });
     if (open.length === 0) return null;
-    let position = this.sprite.main.position;
-    return this.closest(position, open);
+    return this.closest(this.position, open);
   }
 
   static furthestSpot(position, spots) {
-    return spots.reduce((a, b) => {
+    spots.sort((a, b) => {
       let d1 = Phaser.Point.distance(position, a.position);
       let d2 = Phaser.Point.distance(position, b.position);
-      if (d1 > d2) return a;
-      return b;
-    }, spots[0]);
+      if (d1 < d2) return  1;
+      if (d2 > d1) return -1;
+      return 0;
+    });
+    return spots[0];
   }
 
   static nearestSpot(position, spots) {
-    return spots.reduce((a, b) => {
+    spots.sort((a, b) => {
       let d1 = Phaser.Point.distance(position, a.position);
       let d2 = Phaser.Point.distance(position, b.position);
-      if (d1 < d2) return a;
-      return b;
-    }, spots[0]);
+      if (d1 < d2) return -1;
+      if (d2 > d1) return  1;
+      return 0;
+    });
+    return spots[0];
+  }
+
+  static centroid(points) {
+    let center = new Phaser.Point(0,0);
+    let f = 1 / points.length;
+    for (let point of points)
+      center.add(point.x, point.y);
+    center.multiply(f, f);
+    return center;
   }
 
   findHidingSpot() {
     let {level, guards} = this.game;
-    let position = this.sprite.main.position;
-    let open = level.hidingSpots().filter(h => {
-      return guards.filter(g => {
-        let d = Phaser.Point.distance(h.position, g.position);
-        return d < 100;
-      }).length === 0;
+    let spots = level.hidingSpots();
+    let from = Intruder.centroid(guards.map(g => g.position));
+    if (this.spotted)
+      from = this.nearestGuard().position;
+    spots.sort((a, b) => {
+      let d1 = Phaser.Point.distance(a.position, from);
+      let d2 = Phaser.Point.distance(b.position, from);
+      if (d1 < d2) return  1;
+      if (d2 > d1) return -1;
+      return 0;
     });
-    if (this.spotted) {
-      return Intruder.furthestSpot(this.position, open);
-    }
-    return Intruder.nearestSpot(this.position, open);
+    let spot = spots[0];
+    return spot;
   }
 
   updateLocations() {

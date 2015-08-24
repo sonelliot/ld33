@@ -68,7 +68,9 @@ export class Level {
     return this.crates.filter(cr => cr.hidable());
   }
 
-  path(start, end, then) {
+  path(start, end, then, grid=this.walkable) {
+    this.pathfinder.setGrid(grid);
+
     let zoom = this.game.zoom;
     let startIndex = Level.tileIndex(start, this.tilemap, zoom);
     let endIndex = Level.tileIndex(end, this.tilemap, zoom);
@@ -80,32 +82,54 @@ export class Level {
     this.pathfinder.calculate();
   }
 
-  light(places) {
-    this.fog.forEach(r => r.forEach(t => t.alpha = 0.5));
-    for (let {position, visibility} of places)
-      this.lighten(position, visibility);
+  mask(walkable, indices) {
+    let limit = Math.max(walkable.length, walkable[0].length);
+    let masked = [];
+
+    for (let row of walkable)
+      masked.push(row.slice());
+    for (let {x, y} of indices)
+      masked[x][y] = 1;
+
+    return masked;
   }
 
-  lighten(position, radius) {
+  light(places) {
+    this.fog.forEach(r => r.forEach(t => t.alpha = 0.5));
+    
+    let indices = [];
+    for (let {position, visibility} of places)
+      indices = indices.concat(this.litIndices(position, visibility));
+
+    for (let {x, y} of indices) {
+      let tile = this.fog[x][y];
+      tile.alpha = 0.0;
+    }
+
+    this.masked = this.mask(this.walkable, indices);
+  }
+
+  litIndices(position, radius) {
     let center = Level.tileIndex(position, this.tilemap, this.game.zoom);
-    let {width, height} = this.tilemap;
+    let limit = Math.max(this.tilemap.width, this.tilemap.height);
 
     let w = {
       start: Math.max(0, center.x - radius - 1),
-      end: Math.min(width, center.x + radius) };
+      end: Math.min(limit, center.x + radius) };
     let h = {
       start: Math.max(0, center.y - radius),
-      end: Math.min(height, center.y + radius + 1) };
+      end: Math.min(limit, center.y + radius + 1) };
 
+    let indices = [];
     for (let x = w.start; x < w.end; x++) {
       for (let y = h.start; y < h.end; y++) {
-        let tile = this.fog[x][y];
         let d = Math.floor(
           new Phaser.Point(x - center.x, y - center.y).getMagnitude());
-        if (d < radius - 1)
-          tile.alpha = 0.0;
+        if (d < radius)
+          indices.push({x: x, y: y});
       }
     }
+    return indices;
   }
 
   static tileIndex(point, tilemap, zoom) {
@@ -142,9 +166,10 @@ export class Level {
 
   static createFog(game, tilemap) {
     let tiles = [];
-    for (let x = 0; x < tilemap.width; x++) {
+    let limit = Math.max(tilemap.width, tilemap.height);
+    for (let x = 0; x < limit; x++) {
       let row = [];
-      for (let y = 0; y < tilemap.height; y++) {
+      for (let y = 0; y < limit; y++) {
         let position = Level.tilePosition(x, y, tilemap, game.zoom);
         let sprite = game.add.sprite(position.x, position.y, 'blank');
         sprite.anchor.set(0.5, 0.5);

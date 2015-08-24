@@ -7,20 +7,22 @@ export class Guard extends Character {
 
     let params = this.params(type);
 
+    this.active = true;
+
     this.speed = params.speed;
     this.visibility = params.visibility;
-    this.fireRate = params.fireRate;
 
     this.fired = game.time.totalElapsedSeconds();
     this.hidingSpot = null;
 
-    this.sprite.shotgun = game.add.sprite(0, 0, 'shotgun', null, this.group);
-    this.sprite.shotgun.anchor.set(0.5, 0.5);
-    this.sprite.shotgun.position.set(this.position.x, this.position.y);
-    this.sprite.shotgun.smoothed = false;
-    this.sprite.shotgun.scale.set(game.zoom, game.zoom);
-
-    this.shot = game.add.audio('shotgun1');
+    if (params.armed) {
+      this.sprite.shotgun = game.add.sprite(0, 0, 'shotgun', null, this.group);
+      this.sprite.shotgun.anchor.set(0.5, 0.5);
+      this.sprite.shotgun.position.set(this.position.x, this.position.y);
+      this.sprite.shotgun.smoothed = false;
+      this.sprite.shotgun.scale.set(game.zoom, game.zoom);
+      this.shot = game.add.audio('shotgun1');
+    }
 
     let pointer = game.input.activePointer;
     pointer.leftButton.onDown.add(_ => {
@@ -32,29 +34,19 @@ export class Guard extends Character {
           if (path === null || path.length === 0)
             return;
           this.path = path.splice(1);
-          this.showPath(this.path);
+          // this.showPath(this.path);
         });
       }
     });
-
-    this.disks = [];
-    for (let i = 0; i < 100; i++) {
-      let d = game.add.sprite(0, 0, 'disk');
-      let f = game.zoom * 0.75;
-      d.anchor.set(0.5, 0.5);
-      d.scale.set(f,f);
-      d.visible = false;
-      this.disks.push(d);
-    }
   }
 
   params(type) {
     if (type === 'pushover')
-      return { speed: 100, fireRate: 2.0, visibility: 5 };
+      return { speed: 100, armed: false, visibility: 4 };
     else if (type === 'capable')
-      return { speed: 100, fireRate: 1.0, visibility: 5 };
+      return { speed: 100, armed: false, visibility: 4 };
     else if (type === 'badass')
-      return { speed: 100, fireRate: 0.5, visibility: 7 };
+      return { speed: 100, armed: true, visibility: 4 };
     return null;
   }
 
@@ -67,20 +59,6 @@ export class Guard extends Character {
       return 'barely';
     else
       return 'no';
-  }
-
-  hidePath() {
-    this.disks.forEach(d => d.visible = false);
-  }
-
-  showPath(path) {
-    this.hidePath();
-    for (let i =0; i < path.length; i++) {
-      let point = path[i];
-      let disk = this.disks[i];
-      disk.position.set(point.x, point.y);
-      disk.visible = true;
-    }
   }
 
   select(enable) {
@@ -111,20 +89,26 @@ export class Guard extends Character {
   update() {
     super.update();
 
-    this.sprite.shotgun.position.set(
-      this.position.x, this.position.y - 8);
-    this.sprite.shotgun.scale.copyFrom(this.scale);
+    if (!this.active) return;
 
-    let {position, alive} = this.game.intruder;
-    let hidden = this.game.intruder.hiding();
-    if (!hidden && alive && Phaser.Point.distance(this.position, position) < 150)
-      this.fire(this.game.intruder.position);
+    if (this.sprite.shotgun) {
+      this.sprite.shotgun.position.set(
+        this.position.x, this.position.y - 8);
+      this.sprite.shotgun.scale.copyFrom(this.scale);
+
+      let vis = this.canSee(this.game.intruder);
+
+      let {position, alive} = this.game.intruder;
+      let hidden = this.game.intruder.hiding();
+      if (!hidden && alive && vis === 'clear')
+        this.fire(this.game.intruder.position);
+    }
   }
 
   fire(target) {
     let now = this.game.time.totalElapsedSeconds();
     let since = now - this.fired;
-    if (since > this.fireRate) {
+    if (since > 2.0) {
       let dirn = Phaser.Point.subtract(target, this.position);
       dirn.normalize();
       
@@ -138,5 +122,10 @@ export class Guard extends Character {
   stop() {
     super.stop();
     this.hidePath();
+  }
+
+  deactivate() {
+    this.active = false;
+    this.stop();
   }
 };
