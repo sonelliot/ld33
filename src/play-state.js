@@ -21,8 +21,8 @@ export class PlayState {
     function tilemap(name) {
       game.load.tilemap(name, name + '.json', null, Phaser.Tilemap.TILED_JSON);
     }
-    function sound(name) {
-      game.load.audio(name, name + '.wav');
+    function sound(name, ext='.wav') {
+      game.load.audio(name, name + ext);
     }
 
     const images = [
@@ -74,6 +74,8 @@ export class PlayState {
       tilemap(tm);
     for (let snd of sounds)
       sound(snd);
+
+    sound('music', '.mp3');
   }
 
   init (level) {
@@ -113,20 +115,28 @@ export class PlayState {
     this.clear(this.game);
     this.loadLevel(game, 'map' + game.levelId);
 
+    let keyboard = this.game.input.keyboard;
     let numbers = ['ONE', 'TWO', 'THREE', 'FOUR'];
     for (let i = 0; i < game.guards.length; i++) {
       let number = numbers[i];
-      let key = game.input.keyboard.addKey(Phaser.Keyboard[number]);
+      let key = keyboard.addKey(Phaser.Keyboard[number]);
       key.onDown.add(_ => {
         game.guards[i].select();
       });
     }
 
+    keyboard.addKey(Phaser.Keyboard.M).onDown.add(_ => {
+      if (this.bgm.isPlaying)
+        this.bgm.pause();
+      else
+        this.bgm.resume();
+    });
+
     game.cameraman = new CameraMan(game);
     game.world.resize(2000, 2000);
 
-    this.bgm = game.add.audio('music', 1, true);
-    // this.bgm.play();
+    this.bgm = game.add.audio('music', 0.5, true);
+    this.bgm.play();
   }
 
   update(game) {
@@ -200,6 +210,12 @@ export class PlayState {
     if (game.level) {
       game.level.tilemap.destroy();
       game.level = null;
+    }
+
+    if (this.bgm) {
+      this.bgm.stop();
+      this.bgm.destroy();
+      delete this.bgm;
     }
   }
 };
