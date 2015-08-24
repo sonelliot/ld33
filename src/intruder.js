@@ -3,7 +3,7 @@ import {Character} from './character.js';
 export class Intruder extends Character {
   constructor(game, position={x:0, y:0}, group) {
     super(game, 'intruder', position, group);
-    this.speed = 120;
+    this.speed = 160;
     this.locations = {};
     this.alive = true;
     this.exit = null;
