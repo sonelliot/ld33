@@ -34,6 +34,7 @@ function preload(game) {
     , 'blood2'
     , 'blood3'
     , 'cone'
+    , 'lkp'
     , 'crate_open'
     , 'crate_closed'
     , 'disk'
@@ -138,6 +139,7 @@ function create(game) {
 
   game.question = new Sym(game, 'question', new Phaser.Point(0,0));
   game.bang = new Sym(game, 'bang', new Phaser.Point(0,0));
+  game.lkp = new Sym(game, 'lkp', new Phaser.Point(0,0));
 
   game.menu = {};
   game.menu.lose = new Menu(game, { title: 'YOU LOSE', button: 'RETRY' }, _ => {

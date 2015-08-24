@@ -69,12 +69,14 @@ export class Intruder extends Character {
   }
 
   flee(vis) {
-    let {bang} = this.game;
+    let {bang, lkp} = this.game;
     bang.position.set(this.position.x, this.position.y - 50);
 
     if (vis === 'barely') {
-      this.spotted = false;
       bang.hide();
+    } else if (vis === 'no') {
+      lkp.show(this.position);
+      this.spotted = false;
     }
   }
 
