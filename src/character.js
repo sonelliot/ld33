@@ -31,7 +31,7 @@ export class Character {
     let dirn = Phaser.Point.normalize(between);
     this.facing = dirn;
     sprite.body.velocity.set(this.speed * dirn.x, this.speed * dirn.y);
-    if (between.getMagnitude() < 1.0)
+    if (between.getMagnitude() < 10.0)
       return true;
     return false;
   }

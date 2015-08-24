@@ -6,6 +6,7 @@ export class Timer {
     this.group.position.set(game.width-50, 10);
     this.label = game.add.text(0, 0, '', {
       font: '14px Pixel', fill: 'white' }, this.group);
+    this.label.fixedToCamera = true;
     this.remaining = amount;
     this.expired = expired;
   }
