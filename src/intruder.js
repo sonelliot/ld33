@@ -3,7 +3,7 @@ import {Character} from './character.js';
 export class Intruder extends Character {
   constructor(game, position={x:0, y:0}) {
     super(game, 'intruder', position);
-    this.speed = 50;
+    this.speed = 120;
     this.locations = {};
     this.alive = true;
     this.exit = null;
@@ -57,7 +57,7 @@ export class Intruder extends Character {
     }
 
     this.updateVisible(vis);
-    this.updateSpeed(vis);
+    // this.updateSpeed(vis);
 
     if (!this.hidingSpot) {
       this.hidingSpot = this.findHidingSpot();

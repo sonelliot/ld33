@@ -42,11 +42,11 @@ export class Guard extends Character {
 
   params(type) {
     if (type === 'pushover')
-      return { speed: 100, armed: false, visibility: 4 };
+      return { speed: 60, armed: false, visibility: 4 };
     else if (type === 'capable')
-      return { speed: 100, armed: false, visibility: 4 };
+      return { speed: 60, armed: false, visibility: 4 };
     else if (type === 'badass')
-      return { speed: 100, armed: true, visibility: 4 };
+      return { speed: 60, armed: true, visibility: 4 };
     return null;
   }
 
@@ -90,6 +90,9 @@ export class Guard extends Character {
     super.update();
 
     if (!this.active) return;
+
+    if (this.canSee(this.game.lkp) === 'clear')
+      this.game.lkp.hide();
 
     if (this.sprite.shotgun) {
       this.sprite.shotgun.position.set(
