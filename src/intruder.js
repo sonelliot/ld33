@@ -10,10 +10,24 @@ export class Intruder extends Character {
   update() {
     super.update();
 
-    // this.updateWin();
-    // this.updateLose();
-    // this.updatePath();
-    // this.updateVisible();
+    this.updateWin();
+    this.updateLose();
+    this.updatePath();
+    this.updateVisible();
+    this.updateSpeed();
+  }
+
+  updateSpeed() {
+    let position = this.sprite.main.position;
+    let closest = this.closest(position, this.game.guards.map(
+      g => g.sprite.main.position));
+    let dist = Phaser.Point.distance(position, closest);
+    if (dist < 150) {
+      this.speed = 120.0
+    }
+    else {
+      this.speed = 50.0
+    }
   }
 
   updateWin() {

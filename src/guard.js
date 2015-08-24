@@ -85,7 +85,7 @@ export class Guard extends Character {
       this.position.x, this.position.y - 8);
     this.sprite.shotgun.scale.copyFrom(this.scale);
 
-    this.fire(this.game.intruder.position);
+    // this.fire(this.game.intruder.position);
   }
 
   fire(target) {
