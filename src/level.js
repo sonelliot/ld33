@@ -77,10 +77,10 @@ export class Level {
     this.pathfinder.calculate();
   }
 
-  light(positions, radius) {
+  light(places) {
     this.fog.forEach(r => r.forEach(t => t.alpha = 0.5));
-    for (let pos of positions)
-      this.lighten(pos, radius);
+    for (let {position, visibility} of places)
+      this.lighten(position, visibility);
   }
 
   lighten(position, radius) {

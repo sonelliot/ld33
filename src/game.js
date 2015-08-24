@@ -12,7 +12,7 @@ import {Intruder} from './intruder.js';
 import {CameraMan} from './cameraman.js';
 import {Menu} from './menu.js';
 import {Timer} from './timer.js';
-import {Question} from './question.js';
+import {Sym} from './symbol.js';
 
 function preload(game) {
   function sprite(name) {
@@ -21,9 +21,13 @@ function preload(game) {
   function tilemap(name) {
     game.load.tilemap(name, name + '.json', null, Phaser.Tilemap.TILED_JSON);
   }
+  function sound(name) {
+    game.load.audio(name, name + '.wav');
+  }
 
   const images = [
       'box_tile'
+    , 'bang'
     , 'button'
     , 'blank'
     , 'blood1'
@@ -45,6 +49,10 @@ function preload(game) {
     , 'tilemap_ground'
     , 'tilemap_crate'
   ];
+  const sounds = [
+      'seen'
+    , 'shotgun1'
+  ];
   const tilemaps = [
     'map2'
   ];
@@ -53,6 +61,8 @@ function preload(game) {
     sprite(img);
   for (let tm of tilemaps)
     tilemap(tm);
+  for (let snd of sounds)
+    sound(snd);
 }
 
 function clear(game) {
@@ -126,7 +136,8 @@ function create(game) {
 
   game.bullets = [];
 
-  game.question = new Question(game, new Phaser.Point(0,0));
+  game.question = new Sym(game, 'question', new Phaser.Point(0,0));
+  game.bang = new Sym(game, 'bang', new Phaser.Point(0,0));
 
   game.menu = {};
   game.menu.lose = new Menu(game, { title: 'YOU LOSE', button: 'RETRY' }, _ => {
@@ -173,7 +184,7 @@ function update(game) {
     bullet.update();
   }
 
-  game.level.light(game.guards.map(c => c.position), 5);
+  game.level.light(game.guards);
   game.cameraman.update();
   game.timer.update();
 }

@@ -10,6 +10,7 @@ export class Intruder extends Character {
     const speed = 80;
 
     this.hidingSpot = null;
+    this.spotted = false;
 
     this.bloodspurt = game.add.emitter(0, 0, 50);
     this.bloodspurt.makeParticles(['blood1', 'blood2', 'blood3']);
@@ -20,19 +21,41 @@ export class Intruder extends Character {
     this.bloodspurt.setScale(1, 4, 1, 4, 100, Phaser.Easing.Cubic.In);
     this.bloodspurt.gravity = 0;
     this.bloodspurt.particleDrag.set(60, 60);
+
+    this.seen = game.add.audio('seen');
   }
 
   hiding() {
     return this.hidingSpot !== null && this.hidingSpot.occupied();
   }
 
-  update() {
+  alert() {
+    this.spotted = true;
+    this.seen.play();
+    this.game.bang.show(new Phaser.Point(
+      this.position.x, this.position.y - 50
+    ));
+  }
 
-    this.updateVisible();
+  update() {
     this.updateLose();
 
     if (!this.alive || this.hiding())
       return;
+
+    let nearest = this.nearestGuard();
+    let vis = nearest.canSee(this);
+
+    if (vis === 'clear' && !this.spotted) {
+      this.alert();
+    }
+
+    if (this.spotted) {
+      this.flee(vis);
+    }
+
+    this.updateVisible(vis);
+    this.updateSpeed(vis);
 
     let spot = this.findHidingSpot();
     if (spot) {
@@ -41,22 +64,27 @@ export class Intruder extends Character {
     }
 
     this.updateHiding();
-    this.updateSpeed();
 
     super.update();
   }
 
-  updateSpeed() {
-    let position = this.sprite.main.position;
-    let closest = this.closest(position, this.game.guards.map(
-      g => g.sprite.main.position));
-    let dist = Phaser.Point.distance(position, closest);
-    if (dist < 150) {
+  flee(vis) {
+    let {bang} = this.game;
+    bang.position.set(this.position.x, this.position.y - 50);
+
+    if (vis === 'barely') {
+      this.spotted = false;
+      bang.hide();
+    }
+  }
+
+  updateSpeed(vis) {
+    if (vis === 'clear')
+      this.speed = 160.0;
+    else if (vis === 'barely')
       this.speed = 120.0;
-    }
-    else {
-      this.speed = 50.0;
-    }
+    else
+      this.speed = 60.0;
   }
 
   die() {
@@ -103,17 +131,22 @@ export class Intruder extends Character {
     });
   }
 
-  updateVisible() {
-    let position = this.sprite.main.position;
-    let closest = this.closest(position, this.game.guards.map(
-      g => g.sprite.main.position));
-    let dist = Phaser.Point.distance(position, closest);
-    if (dist < 100) {
+  nearestGuard() {
+    let {guards} = this.game;
+    return guards.reduce((a, b) => {
+      let d1 = Phaser.Point.distance(this.position, a.position);
+      let d2 = Phaser.Point.distance(this.position, b.position);
+      if (d1 < d2) return a;
+      else return b;
+    }, guards[0]);
+  }
+
+  updateVisible(vis) {
+    let nearest = this.nearestGuard();
+    if (vis === 'clear')
       this.sprite.main.alpha = 1.0;
-    }
-    else if (dist < 150) {
+    else if (vis === 'barely')
       this.sprite.main.alpha = 0.5;
-    }
     else
       this.sprite.main.alpha = 0.0;
   }
@@ -150,6 +183,24 @@ export class Intruder extends Character {
     return this.closest(position, open);
   }
 
+  static furthestSpot(position, spots) {
+    return spots.reduce((a, b) => {
+      let d1 = Phaser.Point.distance(position, a.position);
+      let d2 = Phaser.Point.distance(position, b.position);
+      if (d1 > d2) return a;
+      return b;
+    }, spots[0]);
+  }
+
+  static nearestSpot(position, spots) {
+    return spots.reduce((a, b) => {
+      let d1 = Phaser.Point.distance(position, a.position);
+      let d2 = Phaser.Point.distance(position, b.position);
+      if (d1 < d2) return a;
+      return b;
+    }, spots[0]);
+  }
+
   findHidingSpot() {
     let {level, guards} = this.game;
     let position = this.sprite.main.position;
@@ -159,13 +210,10 @@ export class Intruder extends Character {
         return d < 100;
       }).length === 0;
     });
-    let closest = open.reduce((a, b) => {
-      let d1 = Phaser.Point.distance(a, this.position);
-      let d2 = Phaser.Point.distance(b, this.position);
-      if (d1 < d2) return a;
-      else return b;
-    }, open[0]);
-    return closest;
+    if (this.spotted) {
+      return Intruder.furthestSpot(this.position, open);
+    }
+    return Intruder.nearestSpot(this.position, open);
   }
 
   updateLocations() {

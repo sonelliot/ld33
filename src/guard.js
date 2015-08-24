@@ -2,8 +2,10 @@ import {Character} from './character.js';
 import {Bullet} from './bullet.js';
 
 export class Guard extends Character {
-  constructor(game, position={x: 0, y: 0}) {
+  constructor(game, position={x: 0, y: 0}, visibility=5) {
     super(game, 'guard', position);
+
+    this.visibility = visibility;
 
     this.fired = game.time.totalElapsedSeconds();
     this.hidingSpot = null;
@@ -13,6 +15,8 @@ export class Guard extends Character {
     this.sprite.shotgun.position.set(this.position.x, this.position.y);
     this.sprite.shotgun.smoothed = false;
     this.sprite.shotgun.scale.set(game.zoom, game.zoom);
+
+    this.shot = game.add.audio('shotgun1');
 
     let pointer = game.input.activePointer;
     pointer.leftButton.onDown.add(_ => {
@@ -40,6 +44,17 @@ export class Guard extends Character {
     }
   }
 
+  canSee(target) {
+    const unit = 20;
+    let dist = Phaser.Point.distance(target.position, this.position);
+    if (dist < (this.visibility * unit))
+      return 'clear';
+    else if (dist < ((this.visibility + 2) * unit))
+      return 'barely';
+    else
+      return 'no';
+  }
+
   hidePath() {
     this.disks.forEach(d => d.visible = false);
   }
@@ -52,11 +67,6 @@ export class Guard extends Character {
       disk.position.set(point.x, point.y);
       disk.visible = true;
     }
-  }
-
-  investigate(hidingSpot) {
-    this.hidingSpot = hidingSpot;
-    
   }
 
   select(enable) {
@@ -92,7 +102,8 @@ export class Guard extends Character {
     this.sprite.shotgun.scale.copyFrom(this.scale);
 
     // let {position, alive} = this.game.intruder;
-    // if (alive && Phaser.Point.distance(this.position, position) < 150)
+    // let hidden = this.game.intruder.hiding();
+    // if (!hidden && alive && Phaser.Point.distance(this.position, position) < 150)
     //   this.fire(this.game.intruder.position);
   }
 
@@ -102,7 +113,8 @@ export class Guard extends Character {
     if (since > 1.0) {
       let dirn = Phaser.Point.subtract(target, this.position);
       dirn.normalize();
-
+      
+      this.shot.play();
       this.fired = this.game.time.totalElapsedSeconds();
       this.game.bullets.push(new Bullet(
         this.game, this.position, dirn, 300.0));

@@ -1,12 +1,12 @@
 
-export class Question {
-  constructor(game, position) {
+export class Sym {
+  constructor(game, key, position) {
     this.game = game;
     this.position = position;
     this.group = game.add.group();
 
     this.sprite = game.add.sprite(
-      position.x, position.y, 'question', null, this.group);
+      position.x, position.y, key, null, this.group);
     this.sprite.anchor.set(0.5, 0.5);
     this.sprite.smoothed = false;
     this.sprite.scale.set(game.zoom, game.zoom);

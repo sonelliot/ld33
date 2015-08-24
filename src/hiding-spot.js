@@ -24,6 +24,7 @@ export class HidingSpot {
 
     this.closed.events.onInputOver.add(_ => {
       let {active} = this.game.guards;
+      if (!active) return;
       let dist = Phaser.Point.distance(active.position, this.position);
       if (dist < SEARCH_RADIUS) {
         let {question} = this.game;
